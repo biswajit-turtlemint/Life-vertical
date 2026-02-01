@@ -1,4 +1,4 @@
-## 1. Sequence Diagram - Life Service - quotes
+## 1. Sequence Diagram - Life Service - quotes (/request call platform->life)
 
 ```
 Client → LifeResultsAPI.getRequest
