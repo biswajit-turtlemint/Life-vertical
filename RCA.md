@@ -179,3 +179,59 @@ ELSE
 - `Input_Policy_Term` and `Input_Premium_Payment_Term` match
 
 ---
+
+---
+
+## Life-Service /results API -> Here the call goes from platform->life service. From the request API we get the valid products keylist. That keylist is then passed on to results api payload which is then iterated over one by one and for each productCode the call comes to life-service.
+
+```
+CLIENT REQUEST
+├─ productCode: "P88"
+├─ PremiumRequest (age, PT, PPT, riders, offers)
+└─ BrokerConfig (determined from hostname)
+
+↓
+
+CONTROLLER (LifeResultsAPI)
+├─ Set default currency
+└─ Delegate to service
+
+↓
+
+SERVICE (LifeResultsServiceImpl)
+├─ Fetch valid product rows for product code
+├─ Merge rider selections
+├─ Merge offer details
+├─ Merge ULIP fund allocation
+└─ For each product option:
+   ├─ Get appropriate results provider
+   ├─ Call getResultsFromProviderV2()
+   ├─ Save rider details (async)
+   ├─ Create response object
+   └─ Post-process response
+
+↓
+
+PROVIDER LAYER (Multiple Implementations)
+├─ NVEST Provider → Call NVEST API
+├─ Insurer Provider → Call Insurer API (MaxLife, Bajaj, etc.)
+├─ CIS Provider → Call Integrated Service
+└─ Offline Provider → Use DB factors
+
+↓
+
+RESPONSE PROCESSING
+├─ Populate error categories
+├─ Add result card info
+├─ Generate BI timeline
+├─ Save to database
+└─ Sort and classify responses
+
+↓
+
+FINAL RESPONSE
+└─ Mono<PremiumResponse> with quotes
+```
+
+---
+
