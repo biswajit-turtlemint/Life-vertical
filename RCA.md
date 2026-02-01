@@ -1,4 +1,4 @@
-## 1. Sequence Diagram - Life Service - quotes (/request call platform->life)
+## 1. Sequence Diagram - Life Service - quotes (/request call platform->life) - in platform service cookies are being set and then the call is redirected to service level for further validation
 
 ```
 Client → LifeResultsAPI.getRequest
