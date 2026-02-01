@@ -1,5 +1,3 @@
----
-
 ## 1. Summary of query API - fetches stream if eligible products on the basis of premiumRequest
 
 ```
