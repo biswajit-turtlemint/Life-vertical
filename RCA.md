@@ -1,4 +1,5 @@
-## 1. Summary of /query API - fetches stream of eligible products on the basis of premiumRequest
+## 1. Summary of /query API 
+fetches stream of eligible products on the basis of premiumRequest
 
 ```
 1. CLIENT REQUEST
@@ -42,7 +43,8 @@
 ---
 
 
-## 2. Sequence Diagram - Life Service - quotes (/request call platform->life) - in platform service cookies are being set and then the call is redirected to service level for further validation
+## 2. Sequence Diagram - Life Service quotes 
+(/request call platform->life) - in platform service cookies are being set and then the call is redirected to service level for further validation
 
 ```
 Client → LifeResultsAPI.getRequest
@@ -234,3 +236,144 @@ FINAL RESPONSE
 
 ---
 
+# 5. Comparison: `/validate` vs `/result/{productCode}` API - Understanding the Overlap
+
+
+There is **significant overlap** in logic between these two APIs. Here's a detailed breakdown of what's the same and what's different.
+
+---
+
+## Side-by-Side Comparison
+
+### 1. **VALIDATE API** (`/api/tm-life/v0/premiums/request/validate`)
+**Location**: `LifeResultsAPI.getRequest()` - Line 89
+
+```
+INPUT: PremiumRequest (customer profile + categories)
+       
+PROCESS:
+├─ Extract categories
+├─ Get category-specific validator
+├─ Call validatePremiumRequest(request, brokerConfig, true)
+│  ├─ Fetch all enabled products for category
+│  ├─ Apply validation rules (age, terms, sum assured)
+│  ├─ Run nearest-match algorithm
+│  ├─ Fetch riders metadata (all available riders)
+│  ├─ Fetch offers metadata (all available offers)
+│  ├─ Combine into ValidProductRowsMapper
+│  └─ Returns: Map<String, List<ValidProductRowsMapper>>
+│     (Multiple products with ALL possible options)
+│
+└─ Return ValidationResponse containing:
+   ├─ All eligible products
+   ├─ All available riders per product
+   ├─ All available offers
+   └─ All plan features
+
+OUTPUT: List of ALL products matching customer profile
+        NO premium calculation
+        NO actual quotes
+```
+
+---
+
+### 2. **RESULTS API** (`/api/tm-life/v0/premiums/result/{productCode}`)
+**Location**: `LifeResultsAPI.getResults()` - Line 152
+
+```
+INPUT: productCode (specific product selected)
+       + PremiumRequest (customer profile + rider selections + offer selections)
+       
+PROCESS:
+├─ Extract productCode
+├─ Extract categories
+├─ Get category-specific validator
+├─ Call fetchProductRowsByRequestIdAndProductCode(productCode, request, brokerConfig)
+│  └─ Returns: List<ValidProductRowsMapper> for ONLY that productCode
+│
+├─ Merge rider selections
+│  └─ Link selected riders to product rows
+│
+├─ Merge offer selections
+│  └─ Link selected offers to product rows
+│
+├─ Merge ULIP fund allocation (if applicable)
+│  └─ Link fund allocation choices
+│
+├─ For each product row:
+│  ├─ Get results provider (NVEST/INSURER/CIS/OFFLINE)
+│  ├─ Call getResultsFromProviderV2() 
+│  │  └─ CALLS EXTERNAL INSURER API ✓ (KEY DIFFERENCE)
+│  ├─ Save rider details asynchronously
+│  ├─ Create response object
+│  └─ Post-process (error categories, BI timeline, save to DB)
+│
+├─ Sort responses
+├─ Classify into options
+└─ Return: List<PremiumResult> with actual quotes
+
+OUTPUT: Actual premium quotes for selected product
+        Multiple quote options (different terms/frequencies)
+        With actual premium amounts
+```
+
+---
+
+## Key Differences Explained
+
+| Aspect | VALIDATE API | RESULTS API |
+|--------|--------------|------------|
+| **Purpose** | Product discovery & filtering | Premium calculation & quoting |
+| **Input** | Customer profile only | Customer profile + Selected product + Rider selections |
+| **Product Scope** | ALL eligible products | ONE specific product |
+| **External API Call** | ❌ NO | ✅ YES (Insurer/NVEST API) |
+| **Rider Handling** | Fetches ALL available riders | Uses SELECTED riders only |
+| **Offer Handling** | Fetches ALL available offers | Uses SELECTED offers only |
+| **Premium Calculation** | ❌ NO | ✅ YES |
+| **Output Complexity** | Simple (metadata only) | Complex (quotes + options) |
+| **Time Duration** | ~100-500ms (DB queries only) | ~500ms-2s (includes external API) |
+| **Use Case** | Shopping list of products | Getting actual quote for checkout |
+
+---
+
+## What's SAME Between Both?
+
+### Shared Logic:
+
+```
+BOTH APIs do:
+├─ Extract categories
+├─ Get category-specific validator
+├─ Calculate validation parameters (entry age, maturity age, etc.)
+├─ Apply age/term/sum assured constraints
+├─ Run nearest-match algorithm (if needed)
+├─ Fetch LifeRequestValidatorNM rows from DB
+├─ Fetch LifeProductMaster rows from DB
+├─ Fetch plan features
+├─ Create ValidProductRowsMapper objects
+└─ Apply broker-specific business rules
+```
+
+This shared logic is why **validatePremiumRequest()** exists - it's reusable.
+
+---
+
+## Why This Overlap Exists (Architecture Reasoning)
+
+### The Flow is Intentional:
+
+```
+USER JOURNEY:
+    
+    1. BROWSE: "Show me all life insurance products"
+       └─ CALLS: /request/validate API
+          └─ Gets: List of eligible products + features + riders + offers
+
+    2. SELECT: "Show cards on UI of each valid products"
+       └─ CALLS: /result/{productCode} API
+          └─ Uses validation to fetch correct product rows for P88
+          └─ Merges user selections
+          └─ Calls insurer to get ACTUAL premium
+          └─ Returns: Quoted premium amount
+
+```
