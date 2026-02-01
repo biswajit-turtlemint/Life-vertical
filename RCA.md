@@ -1,4 +1,50 @@
-## 1. Sequence Diagram - Life Service - quotes (/request call platform->life) - in platform service cookies are being set and then the call is redirected to service level for further validation
+---
+
+## 1. Summary of query API - fetches stream if eligible products on the basis of premiumRequest
+
+```
+1. CLIENT REQUEST
+   ├─ POST /api/tm-life/v0/products/query
+   ├─ PremiumRequest (age, terms, sum assured, categories)
+   └─ BrokerConfig (determined from hostname)
+
+2. CONTROLLER LAYER (LifeProductsQueryApi)
+   ├─ Determine broker from hostname
+   ├─ Set currency
+   └─ Delegate to service
+
+3. SERVICE LAYER (LifeProductsQueryServiceImpl)
+   ├─ Pre-process request (reset filters)
+   ├─ Extract categories
+   └─ Get category-specific validator
+
+4. VALIDATOR LAYER (e.g., TermRequestValidator)
+   ├─ Transform request to LifeValidationRequestMapper
+   ├─ Calculate missing fields (entry age, maturity age)
+   ├─ DB QUERY: Fetch enabled LifeProductMaster rows
+   ├─ DB QUERY: Fetch matching LifeRequestValidatorNM rows
+   ├─ DB QUERY: Apply nearest-match algorithm if needed
+   ├─ DB QUERY: Fetch eligible LifeRiderMeta
+   ├─ DB QUERY: Fetch applicable LifeOfferMeta
+   ├─ Combine all data into ValidProductRowsMapper
+   └─ Return Mono<Map<String, List<ValidProductRowsMapper>>>
+
+5. RESPONSE MAPPING (LifeProductsQueryServiceImpl)
+   ├─ Extract basic product info from LifeProductMaster
+   ├─ Extract plan features from PlanFeatureDetails
+   ├─ Extract payout info from LifePayoutInfo
+   ├─ Extract deferment info from LifeDefermentInfo
+   ├─ Map to LifeProductQueryResponseDto
+   └─ Convert List to Flux
+
+6. API RESPONSE
+   └─ Flux<LifeProductQueryResponseDto> (Stream of eligible products)
+```
+
+---
+
+
+## 2. Sequence Diagram - Life Service - quotes (/request call platform->life) - in platform service cookies are being set and then the call is redirected to service level for further validation
 
 ```
 Client → LifeResultsAPI.getRequest
