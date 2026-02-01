@@ -180,9 +180,8 @@ ELSE
 
 ---
 
----
-
-## Life-Service /results API -> Here the call goes from platform->life service. From the request API we get the valid products keylist. That keylist is then passed on to results api payload which is then iterated over one by one and for each productCode the call comes to life-service.
+## 4. Life-Service /results API -> Here the call goes from platform->life service. 
+From the request API we get the valid products keylist. That keylist is then passed on to results api payload which is then iterated over one by one and for each productCode the call comes to life-service.
 
 ```
 CLIENT REQUEST
