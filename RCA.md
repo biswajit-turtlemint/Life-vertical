@@ -1,4 +1,4 @@
-## 1. Summary of query API - fetches stream of eligible products on the basis of premiumRequest
+## 1. Summary of /query API - fetches stream of eligible products on the basis of premiumRequest
 
 ```
 1. CLIENT REQUEST
