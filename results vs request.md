@@ -1,6 +1,5 @@
 # Comparison: `/validate` vs `/result/{productCode}` API - Understanding the Overlap
 
-## YES - You're Absolutely Correct! 
 
 There is **significant overlap** in logic between these two APIs. Here's a detailed breakdown of what's the same and what's different.
 
