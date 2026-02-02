@@ -15,3 +15,4 @@
 - Riders in TM also for life comes through DB. But for credit-life it comes from HUB. 
 - We are planning to move to new implementation on minterprise where all calls will be through IH, but if a client is not having HUB. Then should we also have a DB based filtering also which means old Implementation.
 - After fetching data from IH, validation logic and filtering will be same as life-service. If something is already getting covered in IH end we will skip that filtering logic. Need to discuss with IH team.
+- Even after calling IH for life in new implementation we perform further filtering and validation in code. We need to check all and see with IH if this can be handled or should we add in code.
