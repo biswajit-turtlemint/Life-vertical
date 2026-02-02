@@ -9,3 +9,9 @@
 - In credit life in the same API itself, when we get the validation map, we create the premium request scope, again the IH is called to set add ons. After that the premiumrequest call is made to IH, the response is then transfomed and mapped back.
 
 - In credit life everything happens in that one /quotes api
+
+## Solution
+- We can use credit-life archtecture as base and make our calls to HUB. But we will need a IH team for this.
+- Riders in TM also for life comes through DB. But for credit-life it comes from HUB. 
+- We are planning to move to new implementation on minterprise where all calls will be through IH, but if a client is not having HUB. Then should we also have a DB based filtering also which means old Implementation.
+- After fetching data from IH, validation logic and filtering will be same as life-service. If something is already getting covered in IH end we will skip that filtering logic. Need to discuss with IH team.
