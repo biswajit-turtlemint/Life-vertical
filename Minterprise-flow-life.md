@@ -425,6 +425,15 @@ if (isPendingStatus(status)) {
 
 Also checks `responseOptions` for pending statuses.
 
+Pending behavior clarification:
+- If the selected/main quote for a product is pending, both are true:
+  - product key is added in `pendingKeyList`
+  - `premiumResults[*].status` and `premiumResults[*].lifePremiumResponse.status` are `PENDING`
+- If selected/main quote is success but any variant inside `lifePremiumResponse.responseOptions` is pending:
+  - product key is still added in `pendingKeyList`
+  - main `lifePremiumResponse.status` can remain `SUCCESS`
+  - pending status is visible in `lifePremiumResponse.responseOptions[*].status`
+
 Reference: `/Users/biswajitrout/companyProjects/minterprise/transactional-flows/src/main/java/com/sachetProduct/service/aggregator/SachetLifeAggregator.java:2326`
 
 ### 6.2 Poller processing logic
@@ -581,41 +590,7 @@ If no eligible/validated rows survive, API returns valid wrapper with empty resu
 
 ## 9) Final Response Structure
 
-Response envelope is always `PayloadWrapper`:
-
-```json
-{
-  "data": { "...QuotationResponse...": "..." },
-  "meta": {
-    "status": "SUCCESS",
-    "error": false,
-    "traceId": "...",
-    "timestamp": "..."
-  }
-}
-```
-
-`QuotationResponse` for life quote contains:
-- `productCode`
-- `referenceId`
-- `quoteId`
-- `status` (service-level response status)
-- `productDetails`
-
-`productDetails` includes:
-- `premiumRequest`
-- `valid`, `status`, `errorMessage`
-- `validationMap`
-- `pendingKeyList`
-- `premiumResults`
-- `minPremium`
-- `validationResponse`
-- `resultResponse`
-
-Creation code:
-- `/Users/biswajitrout/companyProjects/minterprise/transactional-flows/src/main/java/com/sachetProduct/service/aggregator/SachetLifeAggregator.java:487`
-
-### 9.1 Example response (pending)
+Create quote and poller APIs both return `PayloadWrapper`:
 
 ```json
 {
@@ -625,6 +600,86 @@ Creation code:
     "quoteId": "QID123",
     "status": "success",
     "productDetails": {
+      "premiumRequest": {
+        "requestType": "INITIAL",
+        "isAsync": true,
+        "vertical": "LIFE",
+        "policyType": "TRADITIONAL",
+        "timestamp": "2026-02-16T04:54:35.749Z",
+        "currency": "INR",
+        "riskInsured": {
+          "dateOfBirth": "1987-10-11T00:00:00+05:30"
+        },
+        "lifePremiumRequest": {
+          "categories": ["investment"],
+          "paymentFrequency": 12,
+          "policyTerm": 10,
+          "premiumPaymentTerm": 10,
+          "premium": 70000
+        }
+      },
+      "valid": true,
+      "status": "valid",
+      "errorMessage": null,
+      "validationMap": {},
+      "renewalsValid": false,
+      "renewalsKey": null,
+      "errorDescription": null,
+      "healthAddOnValidationInfo": null,
+      "pendingKeyList": [],
+      "premiumResults": [],
+      "motorPremiumResult": null,
+      "lifePremiumResults": null,
+      "healthPremiumResults": null,
+      "errorMsg": null,
+      "minPremium": null,
+      "validationResponse": {
+        "premiumRequest": {},
+        "status": "valid",
+        "valid": true,
+        "validationMap": {},
+        "errorMessage": null
+      },
+      "resultResponse": {
+        "premiumRequest": {},
+        "premiumResults": [],
+        "pendingKeyList": []
+      }
+    }
+  },
+  "meta": {
+    "status": "SUCCESS",
+    "error": false,
+    "traceId": "...",
+    "timestamp": "..."
+  }
+}
+```
+
+Creation code:
+- `/Users/biswajitrout/companyProjects/minterprise/transactional-flows/src/main/java/com/sachetProduct/service/aggregator/SachetLifeAggregator.java:487`
+
+### 9.1 Full example: pending quote
+
+```json
+{
+  "data": {
+    "productCode": "life",
+    "referenceId": "REF123",
+    "quoteId": "QID123",
+    "status": "success",
+    "productDetails": {
+      "premiumRequest": {
+        "requestType": "INITIAL",
+        "isAsync": true,
+        "vertical": "LIFE",
+        "policyType": "TRADITIONAL",
+        "currency": "INR",
+        "lifePremiumRequest": {
+          "categories": ["investment"],
+          "paymentFrequency": 12
+        }
+      },
       "status": "valid",
       "valid": true,
       "errorMessage": null,
@@ -635,33 +690,658 @@ Creation code:
           "insurerCode": "HDFCLI"
         }
       },
+      "renewalsValid": false,
+      "renewalsKey": null,
+      "errorDescription": null,
+      "healthAddOnValidationInfo": null,
       "pendingKeyList": ["P31"],
       "premiumResults": [
         {
+          "_id": "ff67ce7f-6fb6-4f5f-a0ff-7e95fdbb7438",
+          "uniqueId": "QID123",
+          "requestId": "REF123",
           "key": "P31",
+          "quoteId": "QID123",
           "status": "PENDING",
           "insurer": "HDFCLI",
+          "vertical": "LIFE",
+          "timestamp": "2026-02-16T04:54:35.749Z",
+          "tax": "0.0",
+          "finalPremium": "0.0",
           "lifePremiumResponse": {
+            "resultId": "3e4b8fa3-22e7-4e5b-b6e9-7e0a0d5cfc10",
             "status": "PENDING",
             "insurerStatus": "PENDING",
+            "insurerBusinessFlowType": "QUOTES_REQUEST",
+            "insurerCode": "HDFCLI",
+            "productCode": "P31",
+            "internalProductCode": "P31",
+            "productName": "Life Investment Plan",
+            "option": "Default",
+            "optionCode": -1,
+            "planType": "TRADITIONAL",
+            "policyTerm": 10,
+            "premiumPaymentTerm": 10,
+            "paymentFrequency": 12,
+            "premium": null,
+            "tax": null,
+            "premiumWithTax": null,
             "responseOptions": []
           }
         }
-      ]
+      ],
+      "motorPremiumResult": null,
+      "lifePremiumResults": null,
+      "healthPremiumResults": null,
+      "errorMsg": null,
+      "minPremium": null,
+      "validationResponse": {
+        "premiumRequest": {
+          "requestType": "INITIAL",
+          "isAsync": true,
+          "vertical": "LIFE"
+        },
+        "status": "valid",
+        "valid": true,
+        "validationMap": {
+          "P31": {
+            "valid": true,
+            "key": "P31",
+            "insurerCode": "HDFCLI"
+          }
+        },
+        "errorMessage": null
+      },
+      "resultResponse": {
+        "premiumRequest": {
+          "requestType": "INITIAL",
+          "isAsync": true,
+          "vertical": "LIFE"
+        },
+        "pendingKeyList": ["P31"],
+        "premiumResults": [
+          {
+            "_id": "ff67ce7f-6fb6-4f5f-a0ff-7e95fdbb7438",
+            "key": "P31",
+            "status": "PENDING"
+          }
+        ]
+      }
     }
   },
   "meta": {
     "status": "SUCCESS",
-    "error": false
+    "error": false,
+    "traceId": "a6e32aa4c8",
+    "timestamp": "2026-02-16T04:54:35.801"
   }
 }
 ```
 
-### 9.2 Example response (poller complete)
+### 9.2 Full example: success quote
 
-When poller resolves everything:
-- `pendingKeyList: []`
-- each `premiumResults[*].lifePremiumResponse.status` is `SUCCESS` or `ERROR`
+```json
+{
+  "data": {
+    "productCode": "life",
+    "referenceId": "REF123",
+    "quoteId": "QID123",
+    "status": "success",
+    "productDetails": {
+      "premiumRequest": {
+        "requestType": "INITIAL",
+        "isAsync": true,
+        "vertical": "LIFE",
+        "policyType": "TRADITIONAL",
+        "currency": "INR",
+        "lifePremiumRequest": {
+          "categories": ["investment"],
+          "paymentFrequency": 12
+        }
+      },
+      "valid": true,
+      "status": "valid",
+      "errorMessage": null,
+      "validationMap": {
+        "P31": {
+          "valid": true,
+          "key": "P31",
+          "insurerCode": "HDFCLI"
+        }
+      },
+      "renewalsValid": false,
+      "renewalsKey": null,
+      "errorDescription": null,
+      "healthAddOnValidationInfo": null,
+      "pendingKeyList": [],
+      "premiumResults": [
+        {
+          "_id": "f6ff9d49-9f45-4f5f-ae9b-c7a2a7fbe123",
+          "uniqueId": "QID123",
+          "requestId": "REF123",
+          "key": "P31",
+          "quoteId": "QID123",
+          "status": "SUCCESS",
+          "insurer": "HDFCLI",
+          "vertical": "LIFE",
+          "timestamp": "2026-02-16T04:54:36.912Z",
+          "tax": "10677.97",
+          "finalPremium": "69999.99",
+          "lifePremiumResponse": {
+            "resultId": "8f0c9ae2-b6e2-4cf4-bce2-b8501aaf236f",
+            "status": "SUCCESS",
+            "insurerStatus": "SUCCESS",
+            "insurerBusinessFlowType": "QUOTES_REQUEST",
+            "insurerCode": "HDFCLI",
+            "productCode": "P31",
+            "internalProductCode": "P31",
+            "productName": "Life Investment Plan",
+            "option": "Default",
+            "optionCode": -1,
+            "planType": "TRADITIONAL",
+            "policyTerm": 10,
+            "premiumPaymentTerm": 10,
+            "paymentFrequency": 12,
+            "age": 38,
+            "sumAssured": 1000000.0,
+            "premium": 59322.02,
+            "tax": 10677.97,
+            "premiumWithTax": 69999.99,
+            "score": 0,
+            "riderList": [],
+            "offerList": [],
+            "responseOptions": []
+          }
+        }
+      ],
+      "motorPremiumResult": null,
+      "lifePremiumResults": null,
+      "healthPremiumResults": null,
+      "errorMsg": null,
+      "minPremium": 70000,
+      "validationResponse": {
+        "premiumRequest": {
+          "requestType": "INITIAL",
+          "isAsync": true,
+          "vertical": "LIFE"
+        },
+        "status": "valid",
+        "valid": true,
+        "validationMap": {
+          "P31": {
+            "valid": true,
+            "key": "P31",
+            "insurerCode": "HDFCLI"
+          }
+        },
+        "errorMessage": null
+      },
+      "resultResponse": {
+        "premiumRequest": {
+          "requestType": "INITIAL",
+          "isAsync": true,
+          "vertical": "LIFE"
+        },
+        "pendingKeyList": [],
+        "premiumResults": [
+          {
+            "_id": "f6ff9d49-9f45-4f5f-ae9b-c7a2a7fbe123",
+            "key": "P31",
+            "status": "SUCCESS"
+          }
+        ]
+      }
+    }
+  },
+  "meta": {
+    "status": "SUCCESS",
+    "error": false,
+    "traceId": "0e128f82f6",
+    "timestamp": "2026-02-16T04:54:36.939"
+  }
+}
+```
+
+### 9.3 Full example: success with rider and variant option
+
+```json
+{
+  "data": {
+    "productCode": "life",
+    "referenceId": "REF456",
+    "quoteId": "QID456",
+    "status": "success",
+    "productDetails": {
+      "premiumRequest": {
+        "requestType": "INITIAL",
+        "vertical": "LIFE",
+        "policyType": "TRADITIONAL",
+        "lifePremiumRequest": {
+          "categories": ["investment"],
+          "paymentFrequency": 12,
+          "riderMeta": [
+            {
+              "optionCode": "2",
+              "riderInfoList": [
+                {
+                  "riderCode": "ADB",
+                  "isSelected": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "valid": true,
+      "status": "valid",
+      "errorMessage": null,
+      "validationMap": {
+        "P51": {
+          "valid": true,
+          "key": "P51",
+          "insurerCode": "ICICILI"
+        }
+      },
+      "renewalsValid": false,
+      "renewalsKey": null,
+      "errorDescription": null,
+      "healthAddOnValidationInfo": null,
+      "pendingKeyList": [],
+      "premiumResults": [
+        {
+          "_id": "7bc2a2f1-a6a3-4a63-bcb2-319db2c77f1f",
+          "uniqueId": "QID456",
+          "requestId": "REF456",
+          "key": "P51",
+          "quoteId": "QID456",
+          "status": "SUCCESS",
+          "insurer": "ICICILI",
+          "vertical": "LIFE",
+          "timestamp": "2026-02-16T05:10:01.021Z",
+          "tax": "11160.00",
+          "finalPremium": "73160.00",
+          "lifePremiumResponse": {
+            "resultId": "72a7d368-6f40-4e56-a26f-83a5b24cbba2",
+            "status": "SUCCESS",
+            "insurerStatus": "SUCCESS",
+            "insurerBusinessFlowType": "QUOTES_REQUEST",
+            "insurerCode": "ICICILI",
+            "productCode": "P51",
+            "internalProductCode": "P51",
+            "productName": "Guaranteed Wealth Pro",
+            "option": "Gold Variant",
+            "optionCode": 2,
+            "planType": "TRADITIONAL",
+            "policyTerm": 10,
+            "premiumPaymentTerm": 10,
+            "paymentFrequency": 12,
+            "premium": 62000.0,
+            "tax": 11160.0,
+            "premiumWithTax": 73160.0,
+            "score": 0,
+            "riderList": [
+              {
+                "riderCode": "ADB",
+                "riderName": "Accidental Death Benefit",
+                "isSelected": true,
+                "isInBuilt": false,
+                "riderPolicyTerm": 10,
+                "riderPremiumPaymentTerm": 10,
+                "riderSumAssured": 250000.0,
+                "riderPremium": 1800.0
+              }
+            ],
+            "offerList": [
+              {
+                "offerCode": "LOYALTYBONUS",
+                "offerName": "Loyalty Bonus",
+                "isSelected": true
+              }
+            ],
+            "responseOptions": [
+              {
+                "status": "SUCCESS",
+                "insurerStatus": "SUCCESS",
+                "insurerCode": "ICICILI",
+                "productCode": "P51",
+                "option": "Silver Variant",
+                "optionCode": 1,
+                "premium": 60500.0,
+                "tax": 10890.0,
+                "premiumWithTax": 71390.0,
+                "riderList": [],
+                "offerList": []
+              }
+            ]
+          }
+        }
+      ],
+      "motorPremiumResult": null,
+      "lifePremiumResults": null,
+      "healthPremiumResults": null,
+      "errorMsg": null,
+      "minPremium": 73160,
+      "validationResponse": {
+        "premiumRequest": {
+          "requestType": "INITIAL",
+          "vertical": "LIFE"
+        },
+        "status": "valid",
+        "valid": true,
+        "validationMap": {
+          "P51": {
+            "valid": true,
+            "key": "P51",
+            "insurerCode": "ICICILI"
+          }
+        },
+        "errorMessage": null
+      },
+      "resultResponse": {
+        "premiumRequest": {
+          "requestType": "INITIAL",
+          "vertical": "LIFE"
+        },
+        "pendingKeyList": [],
+        "premiumResults": [
+          {
+            "_id": "7bc2a2f1-a6a3-4a63-bcb2-319db2c77f1f",
+            "key": "P51",
+            "status": "SUCCESS"
+          }
+        ]
+      }
+    }
+  },
+  "meta": {
+    "status": "SUCCESS",
+    "error": false,
+    "traceId": "4adba8f65d",
+    "timestamp": "2026-02-16T05:10:01.042"
+  }
+}
+```
+
+### 9.4 Full example: failure quote
+
+```json
+{
+  "data": {
+    "productCode": "life",
+    "referenceId": "REF789",
+    "quoteId": "QID789",
+    "status": "success",
+    "productDetails": {
+      "premiumRequest": {
+        "requestType": "INITIAL",
+        "vertical": "LIFE",
+        "policyType": "TRADITIONAL",
+        "lifePremiumRequest": {
+          "categories": ["investment"],
+          "paymentFrequency": 12
+        }
+      },
+      "valid": true,
+      "status": "valid",
+      "errorMessage": "Some quotes failed at provider",
+      "validationMap": {
+        "P99": {
+          "valid": true,
+          "key": "P99",
+          "insurerCode": "BAJAJLI"
+        }
+      },
+      "renewalsValid": false,
+      "renewalsKey": null,
+      "errorDescription": null,
+      "healthAddOnValidationInfo": null,
+      "pendingKeyList": [],
+      "premiumResults": [
+        {
+          "_id": "ac7f691f-3bd5-49f2-bcea-89c2e88d22d2",
+          "uniqueId": "QID789",
+          "requestId": "REF789",
+          "key": "P99",
+          "quoteId": "QID789",
+          "status": "ERROR",
+          "insurer": "BAJAJLI",
+          "vertical": "LIFE",
+          "timestamp": "2026-02-16T05:21:32.145Z",
+          "tax": "0.0",
+          "finalPremium": "0.0",
+          "lifePremiumResponse": {
+            "resultId": "dfc707fd-4b30-488a-906c-bdc84d0e70b6",
+            "status": "ERROR",
+            "insurerStatus": "ERROR",
+            "insurerBusinessFlowType": "QUOTES_REQUEST",
+            "insurerCode": "BAJAJLI",
+            "productCode": "P99",
+            "internalProductCode": "P99",
+            "productName": "Long Term Wealth Plus",
+            "option": "Default",
+            "optionCode": -1,
+            "planType": "TRADITIONAL",
+            "policyTerm": 10,
+            "premiumPaymentTerm": 10,
+            "paymentFrequency": 12,
+            "premium": null,
+            "tax": null,
+            "premiumWithTax": null,
+            "insurerMessage": "INTERNAL_LIFE_SERVICE_ERROR",
+            "responseOptions": []
+          }
+        }
+      ],
+      "motorPremiumResult": null,
+      "lifePremiumResults": null,
+      "healthPremiumResults": null,
+      "errorMsg": null,
+      "minPremium": null,
+      "validationResponse": {
+        "premiumRequest": {
+          "requestType": "INITIAL",
+          "vertical": "LIFE"
+        },
+        "status": "valid",
+        "valid": true,
+        "validationMap": {
+          "P99": {
+            "valid": true,
+            "key": "P99",
+            "insurerCode": "BAJAJLI"
+          }
+        },
+        "errorMessage": "Some quotes failed at provider"
+      },
+      "resultResponse": {
+        "premiumRequest": {
+          "requestType": "INITIAL",
+          "vertical": "LIFE"
+        },
+        "pendingKeyList": [],
+        "premiumResults": [
+          {
+            "_id": "ac7f691f-3bd5-49f2-bcea-89c2e88d22d2",
+            "key": "P99",
+            "status": "ERROR"
+          }
+        ]
+      }
+    }
+  },
+  "meta": {
+    "status": "SUCCESS",
+    "error": false,
+    "traceId": "f55b7d672e",
+    "timestamp": "2026-02-16T05:21:32.175"
+  }
+}
+```
+
+### 9.5 Full example: multiple products in same response
+
+```json
+{
+  "data": {
+    "productCode": "life",
+    "referenceId": "REF901",
+    "quoteId": "QID901",
+    "status": "success",
+    "productDetails": {
+      "premiumRequest": {
+        "requestType": "INITIAL",
+        "vertical": "LIFE",
+        "policyType": "TRADITIONAL",
+        "lifePremiumRequest": {
+          "categories": ["investment"],
+          "paymentFrequency": 12
+        }
+      },
+      "valid": true,
+      "status": "valid",
+      "errorMessage": "Some quotes are still pending",
+      "validationMap": {
+        "P31": {
+          "valid": true,
+          "key": "P31",
+          "insurerCode": "HDFCLI"
+        },
+        "P51": {
+          "valid": true,
+          "key": "P51",
+          "insurerCode": "ICICILI"
+        }
+      },
+      "renewalsValid": false,
+      "renewalsKey": null,
+      "errorDescription": null,
+      "healthAddOnValidationInfo": null,
+      "pendingKeyList": ["P51"],
+      "premiumResults": [
+        {
+          "_id": "d7e9311a-8c6d-4ce9-93f8-369ec4b2752a",
+          "uniqueId": "QID901",
+          "requestId": "REF901",
+          "key": "P31",
+          "quoteId": "QID901",
+          "status": "SUCCESS",
+          "insurer": "HDFCLI",
+          "vertical": "LIFE",
+          "timestamp": "2026-02-16T06:03:44.121Z",
+          "tax": "10200.00",
+          "finalPremium": "66866.67",
+          "lifePremiumResponse": {
+            "resultId": "9bd8f2da-f2be-4f3f-b916-68de24990d99",
+            "status": "SUCCESS",
+            "insurerStatus": "SUCCESS",
+            "insurerBusinessFlowType": "QUOTES_REQUEST",
+            "insurerCode": "HDFCLI",
+            "productCode": "P31",
+            "internalProductCode": "P31",
+            "productName": "Life Investment Plan",
+            "option": "Default",
+            "optionCode": -1,
+            "planType": "TRADITIONAL",
+            "policyTerm": 10,
+            "premiumPaymentTerm": 10,
+            "paymentFrequency": 12,
+            "premium": 56666.67,
+            "tax": 10200.0,
+            "premiumWithTax": 66866.67,
+            "riderList": [],
+            "offerList": [],
+            "responseOptions": []
+          }
+        },
+        {
+          "_id": "2a9a7b32-0e97-42b6-ab21-53eb1c4ee77f",
+          "uniqueId": "QID901",
+          "requestId": "REF901",
+          "key": "P51",
+          "quoteId": "QID901",
+          "status": "PENDING",
+          "insurer": "ICICILI",
+          "vertical": "LIFE",
+          "timestamp": "2026-02-16T06:03:44.129Z",
+          "tax": "0.0",
+          "finalPremium": "0.0",
+          "lifePremiumResponse": {
+            "resultId": "1f5d7df2-7f58-4c2a-bdad-403c5cc61d74",
+            "status": "PENDING",
+            "insurerStatus": "PENDING",
+            "insurerBusinessFlowType": "QUOTES_REQUEST",
+            "insurerCode": "ICICILI",
+            "productCode": "P51",
+            "internalProductCode": "P51",
+            "productName": "Guaranteed Wealth Pro",
+            "option": "Gold Variant",
+            "optionCode": 2,
+            "planType": "TRADITIONAL",
+            "policyTerm": 10,
+            "premiumPaymentTerm": 10,
+            "paymentFrequency": 12,
+            "premium": null,
+            "tax": null,
+            "premiumWithTax": null,
+            "responseOptions": []
+          }
+        }
+      ],
+      "motorPremiumResult": null,
+      "lifePremiumResults": null,
+      "healthPremiumResults": null,
+      "errorMsg": null,
+      "minPremium": 66867,
+      "validationResponse": {
+        "premiumRequest": {
+          "requestType": "INITIAL",
+          "vertical": "LIFE"
+        },
+        "status": "valid",
+        "valid": true,
+        "validationMap": {
+          "P31": {
+            "valid": true,
+            "key": "P31",
+            "insurerCode": "HDFCLI"
+          },
+          "P51": {
+            "valid": true,
+            "key": "P51",
+            "insurerCode": "ICICILI"
+          }
+        },
+        "errorMessage": "Some quotes are still pending"
+      },
+      "resultResponse": {
+        "premiumRequest": {
+          "requestType": "INITIAL",
+          "vertical": "LIFE"
+        },
+        "pendingKeyList": ["P51"],
+        "premiumResults": [
+          {
+            "_id": "d7e9311a-8c6d-4ce9-93f8-369ec4b2752a",
+            "key": "P31",
+            "status": "SUCCESS"
+          },
+          {
+            "_id": "2a9a7b32-0e97-42b6-ab21-53eb1c4ee77f",
+            "key": "P51",
+            "status": "PENDING"
+          }
+        ]
+      }
+    }
+  },
+  "meta": {
+    "status": "SUCCESS",
+    "error": false,
+    "traceId": "6b7a12832a",
+    "timestamp": "2026-02-16T06:03:44.166"
+  }
+}
+```
 
 ---
 
