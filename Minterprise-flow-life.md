@@ -165,6 +165,37 @@ From `createLifePremiumResponse(...)`, these base fields are set and then merged
   - `optionalBenefitAndExtraPremium` (when applicable)
   - `responseOptions` (other variants/options)
 
+#### Variant and `responseOptions` behavior (parent vs options array)
+
+This parent/child variant split is done by minterprise logic at our end, not directly returned in final shape by IH.
+
+How it works:
+1. We call IH for each valid row/variant (`createLifePremiumResponse(...)`), so each variant gets its own life response.
+2. We collect all variant responses for a product key in `responses`.
+3. We choose one response as parent (`mainResponse`) using `pickMainResponse(...)`:
+   - first preference: `status=SUCCESS` and `defaultOption=true`
+   - second preference: any `status=SUCCESS`
+   - else: first available row
+4. Parent response keeps its own `optionCode` at top level.
+5. Remaining variant responses are placed in parent `responseOptions`.
+
+Code snippet:
+
+```java
+responses.sort(Comparator.comparingDouble(response -> getDouble(response, "premiumWithTax", Double.MAX_VALUE)));
+
+Map<String, Object> mainResponse = pickMainResponse(responses);
+List<Map<String, Object>> responseOptions = new ArrayList<>(responses);
+responseOptions.remove(mainResponse);
+mainResponse.put("responseOptions", responseOptions);
+```
+
+So:
+- `lifePremiumResponse.optionCode` at parent level = selected/main variant
+- `lifePremiumResponse.responseOptions[*].optionCode` = other variants
+
+IH still influences this because each variant payload is from IH and then merged, but final parent-vs-options grouping is performed by our aggregator logic.
+
 `companyDetails` support is included and populated from `CompanyDetails` collection with fallback.
 
 Important behavior for `companyDetails`:
