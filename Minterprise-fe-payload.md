@@ -44,7 +44,7 @@ Minterprise fields supported in `data`:
 
 These fields are supported in `data.premiumRequest` for all life categories:
 
-- `requestType`, `isAsync`, `vertical`, `policyType`, `timestamp`
+- `requestType`, `vertical`, `policyType`, `timestamp`
 - `utmParams.utmSource`, `utmParams.utmMedium`, `utmParams.utmUrl`
 - `initialReqFlag`, `customerName`, `userMobile`, `userEmail`
 - `customerDetailId`, `createdByCustomer`, `pospUserName`
@@ -87,7 +87,6 @@ For re-quote, keep same payload and add `data.referenceId`.
   "data": {
     "premiumRequest": {
       "requestType": "INITIAL",
-      "isAsync": true,
       "vertical": "LIFE",
       "policyType": "TERM",
       "timestamp": "2026-02-17T15:15:33.821Z",
@@ -138,7 +137,6 @@ For re-quote, keep same payload and add `data.referenceId`.
   "data": {
     "premiumRequest": {
       "requestType": "INITIAL",
-      "isAsync": true,
       "vertical": "LIFE",
       "policyType": "TRADITIONAL",
       "timestamp": "2026-02-17T15:22:19.538Z",
@@ -194,7 +192,6 @@ For re-quote, keep same payload and add `data.referenceId`.
   "data": {
     "premiumRequest": {
       "requestType": "INITIAL",
-      "isAsync": true,
       "vertical": "LIFE",
       "policyType": "TRADITIONAL",
       "timestamp": "2026-02-17T15:22:19.538Z",
@@ -256,7 +253,6 @@ For re-quote, keep same payload and add `data.referenceId`.
   "data": {
     "premiumRequest": {
       "requestType": "INITIAL",
-      "isAsync": true,
       "vertical": "LIFE",
       "policyType": "ULIP",
       "timestamp": "2026-02-17T15:22:19.538Z",
@@ -318,7 +314,6 @@ For re-quote, keep same payload and add `data.referenceId`.
   "data": {
     "premiumRequest": {
       "requestType": "INITIAL",
-      "isAsync": true,
       "vertical": "LIFE",
       "policyType": "ULIP",
       "timestamp": "2026-02-17T15:27:59.837Z",
@@ -375,7 +370,6 @@ For re-quote, keep same payload and add `data.referenceId`.
   "data": {
     "premiumRequest": {
       "requestType": "INITIAL",
-      "isAsync": true,
       "vertical": "LIFE",
       "policyType": "TRADITIONAL",
       "timestamp": "2026-02-17T15:27:59.837Z",
@@ -436,7 +430,6 @@ For re-quote, keep same payload and add `data.referenceId`.
   "data": {
     "premiumRequest": {
       "requestType": "INITIAL",
-      "isAsync": true,
       "vertical": "LIFE",
       "policyType": "TRADITIONAL",
       "timestamp": "2026-02-17T15:27:59.837Z",
@@ -498,7 +491,6 @@ For re-quote, keep same payload and add `data.referenceId`.
   "data": {
     "premiumRequest": {
       "requestType": "INITIAL",
-      "isAsync": true,
       "vertical": "LIFE",
       "policyType": "TRADITIONAL",
       "timestamp": "2026-02-17T15:35:55.796Z",
@@ -554,7 +546,6 @@ For re-quote, keep same payload and add `data.referenceId`.
   "data": {
     "premiumRequest": {
       "requestType": "INITIAL",
-      "isAsync": true,
       "vertical": "LIFE",
       "policyType": "TRADITIONAL",
       "timestamp": "2026-02-17T15:35:55.796Z",
@@ -616,7 +607,6 @@ For re-quote, keep same payload and add `data.referenceId`.
   "data": {
     "premiumRequest": {
       "requestType": "INITIAL",
-      "isAsync": true,
       "vertical": "LIFE",
       "policyType": "ULIP",
       "timestamp": "2026-02-17T15:35:55.796Z",
@@ -678,7 +668,6 @@ For re-quote, keep same payload and add `data.referenceId`.
   "data": {
     "premiumRequest": {
       "requestType": "INITIAL",
-      "isAsync": true,
       "vertical": "LIFE",
       "policyType": "TRADITIONAL",
       "timestamp": "2026-02-17T15:43:53.040Z",
@@ -738,7 +727,6 @@ For re-quote, keep same payload and add `data.referenceId`.
   "data": {
     "premiumRequest": {
       "requestType": "INITIAL",
-      "isAsync": true,
       "vertical": "LIFE",
       "policyType": "TRADITIONAL",
       "timestamp": "2026-02-17T15:43:53.040Z",
@@ -803,7 +791,6 @@ For re-quote, keep same payload and add `data.referenceId`.
   "data": {
     "premiumRequest": {
       "requestType": "INITIAL",
-      "isAsync": true,
       "vertical": "LIFE",
       "policyType": "ULIP",
       "timestamp": "2026-02-17T15:43:53.040Z",
@@ -868,7 +855,6 @@ For re-quote, keep same payload and add `data.referenceId`.
   "data": {
     "premiumRequest": {
       "requestType": "INITIAL",
-      "isAsync": true,
       "vertical": "LIFE",
       "policyType": "PENSION",
       "timestamp": "2026-02-17T15:46:24.158Z",
@@ -930,7 +916,6 @@ For re-quote, keep same payload and add `data.referenceId`.
   "data": {
     "premiumRequest": {
       "requestType": "INITIAL",
-      "isAsync": true,
       "vertical": "LIFE",
       "policyType": "TRADITIONAL",
       "timestamp": "2026-02-17T15:46:24.158Z",
@@ -994,7 +979,6 @@ For re-quote, keep same payload and add `data.referenceId`.
   "data": {
     "premiumRequest": {
       "requestType": "INITIAL",
-      "isAsync": true,
       "vertical": "LIFE",
       "policyType": "TRADITIONAL",
       "timestamp": "2026-02-17T15:46:24.158Z",
@@ -1058,7 +1042,6 @@ For re-quote, keep same payload and add `data.referenceId`.
   "data": {
     "premiumRequest": {
       "requestType": "INITIAL",
-      "isAsync": true,
       "vertical": "LIFE",
       "policyType": "ULIP",
       "timestamp": "2026-02-17T15:46:24.158Z",
@@ -1122,7 +1105,6 @@ For re-quote, keep same payload and add `data.referenceId`.
   "data": {
     "premiumRequest": {
       "requestType": "INITIAL",
-      "isAsync": true,
       "vertical": "LIFE",
       "policyType": "PENSION",
       "timestamp": "2026-02-17T15:49:30.958Z",
@@ -1188,7 +1170,6 @@ For re-quote, keep same payload and add `data.referenceId`.
   "data": {
     "premiumRequest": {
       "requestType": "INITIAL",
-      "isAsync": true,
       "vertical": "LIFE",
       "policyType": "TRADITIONAL",
       "timestamp": "2026-02-17T15:49:30.958Z",
@@ -1256,7 +1237,6 @@ For re-quote, keep same payload and add `data.referenceId`.
   "data": {
     "premiumRequest": {
       "requestType": "INITIAL",
-      "isAsync": true,
       "vertical": "LIFE",
       "policyType": "TRADITIONAL",
       "timestamp": "2026-02-17T15:49:30.958Z",
@@ -1324,7 +1304,6 @@ For re-quote, keep same payload and add `data.referenceId`.
   "data": {
     "premiumRequest": {
       "requestType": "INITIAL",
-      "isAsync": true,
       "vertical": "LIFE",
       "policyType": "ULIP",
       "timestamp": "2026-02-17T15:49:30.958Z",
