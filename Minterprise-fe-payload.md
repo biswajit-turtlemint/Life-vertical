@@ -2,6 +2,8 @@
 
 This document uses only the payload fields shared by you.
 No extra payload fields are added.
+`policyType` must be sent inside `data.premiumRequest.planDetails.policyType`.
+`pospUserName` must be sent at flat `data.premiumRequest.pospUserName`.
 
 APIs:
 - `POST /api/minterprise/v2/products/life/quotes`
@@ -18,6 +20,7 @@ APIs:
 {
   "data": {
     "premiumRequest": {
+      "pospUserName": "66bb2378ae016500016e5a06",
       "personalDetails": {
         "customerName": "ABID AHMAD SHAH",
         "userMobile": "7400400747",
@@ -56,14 +59,7 @@ APIs:
         "maxIncome": 699999,
         "tmPincode": 192125
       },
-      "utmParams": {
-        "utmSource": "(direct)",
-        "utmMedium": "(none)",
-        "utmUrl": "https://pro.jkbank.topgun.turtle-feature.com/life-insurance/profile/retirement/about-insured"
-      },
-      "requestType": "INITIAL",
-      "vertical": "LIFE",
-      "timestamp": "2026-02-18T21:08:18.969Z"
+      "vertical": "LIFE"
     }
   }
 }
@@ -75,6 +71,7 @@ APIs:
 {
   "data": {
     "premiumRequest": {
+      "pospUserName": "66bb2378ae016500016e5a06",
       "personalDetails": {
         "customerName": "ABID AHMAD SHAH",
         "userEmail": "SHAHABID37@GMAIL.COM",
@@ -112,19 +109,12 @@ APIs:
         "minIncome": 500000,
         "paymentFrequency": 12,
         "planType": "Non-participating",
+        "policyType": "TRADITIONAL",
         "policyTerm": 10,
         "premium": 70000,
         "premiumPaymentTerm": 9,
         "profileType": "guaranteed-returns",
         "riskAppetite": "MEDIUM"
-      },
-      "policyType": "TRADITIONAL",
-      "requestType": "INITIAL",
-      "timestamp": "2026-02-18T21:41:31.199Z",
-      "utmParams": {
-        "utmMedium": "(none)",
-        "utmSource": "(direct)",
-        "utmUrl": "https://pro.jkbank.topgun.turtle-feature.com/life-insurance/profile/retirement/about-insured"
       },
       "vertical": "LIFE"
     }
@@ -138,6 +128,7 @@ APIs:
 {
   "data": {
     "premiumRequest": {
+      "pospUserName": "66bb2378ae016500016e5a06",
       "personalDetails": {
         "customerName": "ABID AHMAD SHAH",
         "userEmail": "SHAHABID37@GMAIL.COM",
@@ -170,19 +161,12 @@ APIs:
         "minIncome": 500000,
         "paymentFrequency": 12,
         "planType": "Participating",
+        "policyType": "TRADITIONAL",
         "policyTerm": 10,
         "premium": 70000,
         "premiumPaymentTerm": 9,
         "profileType": "guaranteed-returns",
         "riskAppetite": "MEDIUM"
-      },
-      "policyType": "TRADITIONAL",
-      "requestType": "INITIAL",
-      "timestamp": "2026-02-18T21:45:24.432Z",
-      "utmParams": {
-        "utmMedium": "(none)",
-        "utmSource": "(direct)",
-        "utmUrl": "https://pro.jkbank.topgun.turtle-feature.com/life-insurance/profile/retirement/about-insured"
       },
       "vertical": "LIFE"
     }
@@ -196,6 +180,7 @@ APIs:
 {
   "data": {
     "premiumRequest": {
+      "pospUserName": "66bb2378ae016500016e5a06",
       "personalDetails": {
         "customerName": "ABID AHMAD SHAH",
         "userEmail": "SHAHABID37@GMAIL.COM",
@@ -233,19 +218,12 @@ APIs:
         "minIncome": 700000,
         "paymentFrequency": 12,
         "planType": "Non-participating",
+        "policyType": "TRADITIONAL",
         "policyTerm": 9,
         "premium": 70000,
         "premiumPaymentTerm": 8,
         "profileType": "ulip",
         "riskAppetite": "MEDIUM"
-      },
-      "policyType": "TRADITIONAL",
-      "requestType": "INITIAL",
-      "timestamp": "2026-02-18T22:54:06.630Z",
-      "utmParams": {
-        "utmMedium": "(none)",
-        "utmSource": "(direct)",
-        "utmUrl": "https://pro.jkbank.topgun.turtle-feature.com/life-insurance/profile/retirement/about-insured"
       },
       "vertical": "LIFE"
     }
@@ -259,6 +237,7 @@ APIs:
 {
   "data": {
     "premiumRequest": {
+      "pospUserName": "66bb2378ae016500016e5a06",
       "personalDetails": {
         "customerName": "ABID AHMAD SHAH",
         "userEmail": "SHAHABID37@GMAIL.COM",
@@ -291,19 +270,12 @@ APIs:
         "minIncome": 500000,
         "paymentFrequency": 12,
         "planType": "ULIP",
+        "policyType": "ULIP",
         "policyTerm": 10,
         "premium": 70000,
         "premiumPaymentTerm": 9,
         "profileType": "ulip",
         "riskAppetite": "MEDIUM"
-      },
-      "policyType": "ULIP",
-      "requestType": "INITIAL",
-      "timestamp": "2026-02-18T22:55:59.609Z",
-      "utmParams": {
-        "utmMedium": "(none)",
-        "utmSource": "(direct)",
-        "utmUrl": "https://pro.jkbank.topgun.turtle-feature.com/life-insurance/profile/retirement/about-insured"
       },
       "vertical": "LIFE"
     }
@@ -317,6 +289,7 @@ APIs:
 {
   "data": {
     "premiumRequest": {
+      "pospUserName": "66bb2378ae016500016e5a06",
       "personalDetails": {
         "customerName": "ABID AHMAD SHAH",
         "userEmail": "SHAHABID37@GMAIL.COM",
@@ -354,19 +327,12 @@ APIs:
         "minIncome": 500000,
         "paymentFrequency": 12,
         "planType": "Participating",
+        "policyType": "TRADITIONAL",
         "policyTerm": 8,
         "premium": 70000,
         "premiumPaymentTerm": 6,
         "profileType": "participating-plans",
         "riskAppetite": "MEDIUM"
-      },
-      "policyType": "TRADITIONAL",
-      "requestType": "INITIAL",
-      "timestamp": "2026-02-18T23:02:41.840Z",
-      "utmParams": {
-        "utmMedium": "(none)",
-        "utmSource": "(direct)",
-        "utmUrl": "https://pro.jkbank.topgun.turtle-feature.com/life-insurance/profile/retirement/about-insured"
       },
       "vertical": "LIFE"
     }
@@ -380,6 +346,7 @@ APIs:
 {
   "data": {
     "premiumRequest": {
+      "pospUserName": "66bb2378ae016500016e5a06",
       "personalDetails": {
         "customerName": "ABID AHMAD SHAH",
         "userEmail": "SHAHABID37@GMAIL.COM",
@@ -412,19 +379,12 @@ APIs:
         "minIncome": 500000,
         "paymentFrequency": 12,
         "planType": "Participating",
+        "policyType": "TRADITIONAL",
         "policyTerm": 9,
         "premium": 70000,
         "premiumPaymentTerm": 8,
         "profileType": "participating-plans",
         "riskAppetite": "MEDIUM"
-      },
-      "policyType": "TRADITIONAL",
-      "requestType": "INITIAL",
-      "timestamp": "2026-02-18T23:05:21.286Z",
-      "utmParams": {
-        "utmMedium": "(none)",
-        "utmSource": "(direct)",
-        "utmUrl": "https://pro.jkbank.topgun.turtle-feature.com/life-insurance/profile/retirement/about-insured"
       },
       "vertical": "LIFE"
     }
@@ -438,6 +398,7 @@ APIs:
 {
   "data": {
     "premiumRequest": {
+      "pospUserName": "66bb2378ae016500016e5a06",
       "personalDetails": {
         "customerName": "ABID AHMAD SHAH",
         "userMobile": "7400400747",
@@ -465,6 +426,7 @@ APIs:
           "child"
         ],
         "planType": "Non-participating",
+        "policyType": "TRADITIONAL",
         "includeCategory": true,
         "maritalStatus": "SINGLE",
         "investmentGoals": "CHILD_EDUCATION",
@@ -482,15 +444,7 @@ APIs:
         "businessModel": "B2B",
         "isNonSelfJourney": true
       },
-      "requestType": "INITIAL",
       "vertical": "LIFE",
-      "policyType": "TRADITIONAL",
-      "timestamp": "2026-02-18T23:13:52.776Z",
-      "utmParams": {
-        "utmSource": "(direct)",
-        "utmMedium": "(none)",
-        "utmUrl": "https://pro.jkbank.topgun.turtle-feature.com/life-insurance/profile/retirement/about-insured"
-      },
       "initialReqFlag": true
     }
   }
@@ -503,6 +457,7 @@ APIs:
 {
   "data": {
     "premiumRequest": {
+      "pospUserName": "66bb2378ae016500016e5a06",
       "personalDetails": {
         "customerName": "ABID AHMAD SHAH",
         "userEmail": "SHAHABID37@GMAIL.COM",
@@ -545,6 +500,7 @@ APIs:
         "payoutFrequency": "YEARLY",
         "payoutIncome": 100000,
         "planType": "Pension",
+        "policyType": "PENSION",
         "plansByPension": false,
         "policyTerm": 15,
         "premium": 70000,
@@ -554,14 +510,6 @@ APIs:
       },
       "initialReqFlag": true,
       "isAsync": true,
-      "policyType": "PENSION",
-      "requestType": "INITIAL",
-      "timestamp": "2026-02-18T23:20:24.500Z",
-      "utmParams": {
-        "utmMedium": "(none)",
-        "utmSource": "(direct)",
-        "utmUrl": "https://pro.jkbank.topgun.turtle-feature.com/life-insurance/profile/retirement/about-insured"
-      },
       "vertical": "LIFE"
     }
   }
@@ -574,6 +522,7 @@ APIs:
 {
   "data": {
     "premiumRequest": {
+      "pospUserName": "66bb2378ae016500016e5a06",
       "personalDetails": {
         "customerName": "ABID AHMAD SHAH",
         "userEmail": "SHAHABID37@GMAIL.COM",
@@ -611,6 +560,7 @@ APIs:
         "payoutFrequency": "YEARLY",
         "payoutIncome": 100000,
         "planType": "Pension",
+        "policyType": "PENSION",
         "plansByPension": false,
         "policyTerm": 15,
         "premium": 70000,
@@ -620,14 +570,6 @@ APIs:
       },
       "initialReqFlag": true,
       "isAsync": true,
-      "policyType": "PENSION",
-      "requestType": "INITIAL",
-      "timestamp": "2026-02-18T23:21:27.816Z",
-      "utmParams": {
-        "utmMedium": "(none)",
-        "utmSource": "(direct)",
-        "utmUrl": "https://pro.jkbank.topgun.turtle-feature.com/life-insurance/profile/retirement/about-insured"
-      },
       "vertical": "LIFE"
     }
   }
@@ -677,6 +619,9 @@ Wrapper:
 - variant fields (`option`, `optionCode`, `responseOptions[]`)
 - rider fields (`riderList`, `totalRiderPremium`, etc.)
 - `companyDetails`
+- payout fields (`payoutValues`, `totalPayoutValues`, `maturityBenefits`, `planNote`, etc.)
+- tax fields (`taxSavingAmount`, `taxSavingsInfo`)
+- additional insurer fields (for example `resultCardsInfo`, `planFeatureList`, `specialBenefits`, etc.)
 
 ---
 
@@ -857,3 +802,412 @@ Wrapper:
 - with `includeRequest=true`, response additionally includes `data.premiumRequest`.
 - `GET /quotes/poll` response is same shape as POST response.
 - FE keeps polling until `pendingKeyList` is empty.
+
+---
+
+## 5) Final response update (authoritative)
+
+This payload doc keeps request payload examples.
+For full response contract, use:
+- `/Users/biswajitrout/companyProjects/minterprise/transactional-flows/docs/life-quote-post-api-spec.md` section `6) Final Contract Update (Authoritative)`.
+
+Important final response rules:
+- `data.quotes` contains only `SUCCESS` rows.
+- `PENDING`/`ERROR` rows are not returned in `quotes`; track them via `data.pendingKeyList` and call poll API.
+- `resultId` is mapped to API `quoteId`.
+- insurer `quoteId` (if present from IH for that insurer) is mapped to API `insurerQuoteId`.
+- `companyDetails` is kept at parent quote level only; it is removed from `responseOptions[*]`.
+- `responseOptions` supports multiple options.
+- `riderList`, `payoutValues`, `totalPayoutValues`, `maturityBenefits`, `taxSavingsInfo`, and other IH fields are returned as-is when present.
+- `addons`/`addOns` is removed from API response.
+
+## 6) Complete full response JSON (authoritative)
+
+```json
+{
+  "data": {
+    "referenceId": "AHUTP1QQBR8",
+    "pendingKeyList": [
+      "P90",
+      "P108",
+      "P118"
+    ],
+    "quotes": [
+      {
+        "quoteId": "dc28c8a00890741fca957b2f92783599",
+        "insurerQuoteId": "b8735fd6-0a0d-4e30-aa73-2ae1e0be8d96",
+        "policyType": "TERM",
+        "insurerCode": "MAXLIFELI",
+        "internalProductCode": "maxlifeli-life-smarttermplanplus",
+        "productCode": "P127",
+        "productName": "Smart Term Plan Plus",
+        "option": "Regular cover",
+        "optionCode": 1,
+        "productUIN": "104N127V02",
+        "tmPlanId": "1460",
+        "policyTerm": 42,
+        "paymentFrequency": 12,
+        "premiumPaymentTerm": 42,
+        "score": 0,
+        "category": "term",
+        "premium": 7845,
+        "taxRate": 0,
+        "premiumWithTax": 7845,
+        "sumAssured": 10000000,
+        "deathBenefitTotal": 10000000,
+        "deathBenefitGuaranteed": 10000000,
+        "responseOptions": [
+          {
+            "quoteId": "6d5ffe95c64e53f849a48396c049ec80",
+            "insurerQuoteId": "fdee0910-ae04-4cfc-b64b-b7556ebb74e9",
+            "policyType": "TERM",
+            "insurerCode": "MAXLIFELI",
+            "internalProductCode": "maxlifeli-life-smarttermplanplus",
+            "productCode": "P127",
+            "productName": "Smart Term Plan Plus",
+            "option": "Early ROP Plus",
+            "optionCode": 3,
+            "productUIN": "104N127V02",
+            "tmPlanId": "1460",
+            "policyTerm": 52,
+            "paymentFrequency": 12,
+            "premiumPaymentTerm": 15,
+            "score": 19,
+            "category": "term",
+            "premium": 23145,
+            "taxRate": 0,
+            "premiumWithTax": 23145,
+            "sumAssured": 10000000,
+            "deathBenefitTotal": 10000000,
+            "deathBenefitGuaranteed": 10000000,
+            "taxSavingAmount": 4629,
+            "status": "SUCCESS",
+            "insurerStatus": "SUCCESS",
+            "insurerMessage": "SUCCESS",
+            "insurerBusinessFlowType": "QUOTES_REQUEST",
+            "payoutValues": {
+              "LUMPSUM": [
+                {
+                  "payoutType": "LUMPSUM",
+                  "basePayoutValue": 10000000
+                }
+              ],
+              "LUMPSUM_PLUS_LEVEL_INCOME": [
+                {
+                  "payoutType": "LUMPSUM",
+                  "basePayoutValue": 5000000
+                },
+                {
+                  "payoutType": "LEVEL_INCOME",
+                  "basePayoutValue": 83333.33333333333,
+                  "payoutFrequency": "MONTHLY",
+                  "benefitTerm": 5
+                }
+              ]
+            },
+            "totalPayoutValues": {
+              "LUMPSUM": 10000000,
+              "LUMPSUM_PLUS_LEVEL_INCOME": 10000000
+            },
+            "maturityBenefits": [
+              "Return of Total Premiums Paid at the end of Premium Payment Term, while life cover continues till policy term end."
+            ],
+            "planNote": [
+              "Option to receive early Return of Premium at the end of Premium Payment Term",
+              "Life cover continues till end of policy term",
+              "Special Exit Value available post premium payment term"
+            ],
+            "payoutTerm": 5,
+            "payoutFrequency": "MONTHLY",
+            "planType": "Term",
+            "riderList": [
+              {
+                "riderName": "Accidental Death and Dismemberment",
+                "riderDesc": "This rider provides your loved ones with extra financial protection in case of an unexpected eventuality.",
+                "riderShortDesc": "This rider provides your loved ones with extra financial protection.",
+                "riderCode": "R77",
+                "riderApiCode": "R77",
+                "riderCategory": "Accidental Death Benefit",
+                "riderSumAssured": 50000,
+                "riderPolicyTerm": 15,
+                "riderPremiumPaymentTerm": 15,
+                "inBuilt": false,
+                "isSelected": false,
+                "isCoverAmountEditable": true,
+                "isCoverAmountIncludedInBasePlan": false
+              }
+            ],
+            "showRider": false,
+            "showRiderPremium": true,
+            "edc": "2026-02-18",
+            "biProvider": "MAXLIFELI",
+            "isBIPdfAvailable": true,
+            "age": 18,
+            "inputCoverAmount": 10000000,
+            "planFeatureDetailsList": [],
+            "bqpRedirectionEnabled": true,
+            "paymentFirstJourneyCheck": false,
+            "defermentPeriod": 0,
+            "calculatedDefermentPeriod": -2,
+            "incomeStartYear": -2,
+            "calculatedIRR": "-",
+            "cashFlowsPerYearArray": [],
+            "resultCardsInfo": {
+              "investmentAmount": 347175,
+              "investmentPerFrequencyAmount": 23145,
+              "paymentFrequency": 12,
+              "entryAge": 18,
+              "premiumPaymentTerm": 15,
+              "policyTerm": 52,
+              "maturityAge": 70,
+              "deathCoverTillAge": 70,
+              "deathBenefit": 10000000,
+              "taxSavings": 4629,
+              "returnOfPremium": false,
+              "claimSettlementRatio": "99.50%",
+              "incomePeriod": 5,
+              "yearlyIncome": 1000000,
+              "lumpsumAmount": 5000000,
+              "benefitTerm": 5,
+              "defermentPeriod": 0,
+              "calculatedDefermentPeriod": -2,
+              "calculatedIrr": "-",
+              "investmentEndYear": 2041,
+              "incomeBenefitStartYear": 2068
+            },
+            "taxSavingsInfo": {
+              "oldRegime": {
+                "amount": 4629
+              }
+            },
+            "planFeatureList": [
+              {
+                "code": "returnOfPremium",
+                "name": "Return Of Premium",
+                "active": true
+              }
+            ],
+            "errorCategory": "SUCCESS",
+            "defaultOption": false,
+            "cisModuleEnabled": false,
+            "investmentEndYear": 2041,
+            "incomeBenefitStartYear": 2068,
+            "specialBenefits": [
+              "Terminal Illness benefit included",
+              "Premium waiver on permanent disability"
+            ]
+          },
+          {
+            "quoteId": "9f49a203f8207031a79797aff6f8c798",
+            "insurerQuoteId": "3218c981-3014-4e85-b15e-5366f721303b",
+            "policyType": "TERM",
+            "insurerCode": "MAXLIFELI",
+            "internalProductCode": "maxlifeli-life-smarttermplanplus",
+            "productCode": "P127",
+            "productName": "Smart Term Plan Plus",
+            "option": "Return of Premium",
+            "optionCode": 2,
+            "productUIN": "104N127V02",
+            "tmPlanId": "1460",
+            "policyTerm": 42,
+            "paymentFrequency": 12,
+            "premiumPaymentTerm": 42,
+            "score": 0,
+            "category": "term",
+            "premium": 16908,
+            "taxRate": 0,
+            "premiumWithTax": 16908,
+            "sumAssured": 10000000,
+            "deathBenefitTotal": 10000000,
+            "deathBenefitGuaranteed": 10000000,
+            "taxSavingAmount": 3381,
+            "status": "SUCCESS",
+            "insurerStatus": "SUCCESS",
+            "insurerMessage": "SUCCESS",
+            "insurerBusinessFlowType": "QUOTES_REQUEST",
+            "planType": "Term",
+            "showRider": false,
+            "showRiderPremium": true,
+            "edc": "2026-02-18"
+          },
+          {
+            "quoteId": "099bef497ac57068127de20dd6096cd7",
+            "insurerQuoteId": "534731cc-3ac7-464d-acf1-fbf365fe3aaa",
+            "policyType": "TERM",
+            "insurerCode": "MAXLIFELI",
+            "internalProductCode": "maxlifeli-life-smarttermplanplus",
+            "productCode": "P127",
+            "productName": "Smart Term Plan Plus",
+            "option": "Whole Life Cover",
+            "optionCode": 4,
+            "productUIN": "104N127V02",
+            "tmPlanId": "1460",
+            "policyTerm": 82,
+            "paymentFrequency": 12,
+            "premiumPaymentTerm": 15,
+            "score": 34,
+            "category": "term",
+            "premium": 33654,
+            "taxRate": 0,
+            "premiumWithTax": 33654,
+            "sumAssured": 10000000,
+            "deathBenefitTotal": 10000000,
+            "deathBenefitGuaranteed": 10000000,
+            "taxSavingAmount": 6730,
+            "status": "SUCCESS",
+            "insurerStatus": "SUCCESS",
+            "insurerMessage": "SUCCESS",
+            "insurerBusinessFlowType": "QUOTES_REQUEST",
+            "planType": "Term",
+            "showRider": false,
+            "showRiderPremium": true,
+            "edc": "2026-02-18"
+          }
+        ],
+        "taxSavingAmount": 1569,
+        "status": "SUCCESS",
+        "insurerStatus": "SUCCESS",
+        "insurerMessage": "SUCCESS",
+        "insurerBusinessFlowType": "QUOTES_REQUEST",
+        "companyDetails": {
+          "InsurerId": "MAXLIFELI",
+          "InsurerName": "Axis Max Life",
+          "Logo": "MAXLIFELI.jpg",
+          "CompanyDetails": "Axis Max Life Insurance Limited, formerly known as Max Life Insurance Company Ltd., is a joint venture between Max Financial Services Limited (MFSL) and Axis Bank Limited.",
+          "ClaimSettlementRate": {
+            "OneMonth": "99.93",
+            "OneToThreeMonths": "0.13",
+            "ThreeMonthsPlus": "0.02"
+          },
+          "SpeedOfClaimSettlementSummary": "99.93",
+          "InsurerCode": "MAXLIFELI",
+          "ContactDetails": {
+            "Telephone": "1860 120 5577",
+            "Address": "419, Bhai Mohan Singh Nagar, Railmajra, Tehsil Balachaur, District Nawanshahr, Punjab -144 533."
+          },
+          "LifeCompanyDetails": {
+            "claimRatios": {
+              "Claims paid in < 3 months": "",
+              "Claims paid < 1 year": "",
+              "Claims settled ratio (2016-17)": "",
+              "Claims paid < 6 months": "",
+              "Claims paid > 3 months": "",
+              "Claims rejected (2016-17)": "",
+              "Claims paid in < 30 days": ""
+            },
+            "urlClaimForm": "",
+            "solvencyRatio": "201%",
+            "claimSettlementRatio": "99.50%",
+            "inceptionYear": "2002",
+            "numberOfLivesInsured": "1.19 Crs",
+            "assetUnderManagement": "1,22,857 Crs",
+            "branchesAcrossIndia": "269",
+            "freelookPeriod": "Online- 15 days, Offline- 30 days"
+          }
+        },
+        "payoutValues": {
+          "LUMPSUM": [
+            {
+              "payoutType": "LUMPSUM",
+              "basePayoutValue": 10000000
+            }
+          ],
+          "LUMPSUM_PLUS_LEVEL_INCOME": [
+            {
+              "payoutType": "LUMPSUM",
+              "basePayoutValue": 5000000
+            },
+            {
+              "payoutType": "LEVEL_INCOME",
+              "basePayoutValue": 83333.33333333333,
+              "payoutFrequency": "MONTHLY",
+              "benefitTerm": 5
+            }
+          ]
+        },
+        "totalPayoutValues": {
+          "LUMPSUM": 10000000,
+          "LUMPSUM_PLUS_LEVEL_INCOME": 10000000
+        },
+        "maturityBenefits": [
+          "On survival till the end of the policy term. No benefit is payable. The policy will be terminated immediately & automatically on the maturity date."
+        ],
+        "payoutTerm": 5,
+        "payoutFrequency": "MONTHLY",
+        "planType": "Term",
+        "riderList": [
+          {
+            "riderName": "Accidental Death and Dismemberment",
+            "riderDesc": "This rider provides your loved ones with extra financial protection in case of an unexpected eventuality.",
+            "riderShortDesc": "This rider provides your loved ones with extra financial protection.",
+            "riderCode": "R77",
+            "riderApiCode": "R77",
+            "riderCategory": "Accidental Death Benefit",
+            "riderSumAssured": 50000,
+            "riderPolicyTerm": 42,
+            "riderPremiumPaymentTerm": 42,
+            "inBuilt": false,
+            "isSelected": false,
+            "isCoverAmountEditable": true,
+            "isCoverAmountIncludedInBasePlan": false
+          }
+        ],
+        "showRider": false,
+        "showRiderPremium": true,
+        "edc": "2026-02-18",
+        "biProvider": "MAXLIFELI",
+        "isBIPdfAvailable": true,
+        "age": 18,
+        "inputCoverAmount": 10000000,
+        "planFeatureDetailsList": [],
+        "bqpRedirectionEnabled": true,
+        "paymentFirstJourneyCheck": false,
+        "defermentPeriod": 0,
+        "calculatedDefermentPeriod": -2,
+        "incomeStartYear": -2,
+        "calculatedIRR": "-",
+        "cashFlowsPerYearArray": [],
+        "resultCardsInfo": {
+          "investmentAmount": 329490,
+          "investmentPerFrequencyAmount": 7845,
+          "paymentFrequency": 12,
+          "entryAge": 18,
+          "premiumPaymentTerm": 42,
+          "policyTerm": 42,
+          "maturityAge": 60,
+          "deathCoverTillAge": 60,
+          "deathBenefit": 10000000,
+          "taxSavings": 1569,
+          "returnOfPremium": false,
+          "claimSettlementRatio": "99.50%",
+          "incomePeriod": 5,
+          "yearlyIncome": 1000000,
+          "lumpsumAmount": 5000000,
+          "benefitTerm": 5,
+          "defermentPeriod": 0,
+          "calculatedDefermentPeriod": -2,
+          "calculatedIrr": "-",
+          "investmentEndYear": 2068,
+          "incomeBenefitStartYear": 2068
+        },
+        "taxSavingsInfo": {
+          "oldRegime": {
+            "amount": 1569
+          }
+        },
+        "errorCategory": "SUCCESS",
+        "defaultOption": true,
+        "cisModuleEnabled": false,
+        "investmentEndYear": 2068,
+        "incomeBenefitStartYear": 2068
+      }
+    ]
+  },
+  "meta": {
+    "status": "SUCCESS",
+    "error": false,
+    "traceId": "6997cc25a2396d59a5b88585cb8fe4d3",
+    "timestamp": "2026-02-20T02:51:18.843366476"
+  }
+}
+```
