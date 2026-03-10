@@ -148,8 +148,8 @@ node ~/companyProjects/prBot/index.js review --base develop --focus bugs,securit
 ### Setup up your Github username
 
 ```bash
-#git config --global user.name "Your Name"
-#git config --global user.email "your.email@company.com"
+git config --global user.name "Your Name"
+git config --global user.email "your.email@company.com"
 ```
 
 ### All CLI Options
