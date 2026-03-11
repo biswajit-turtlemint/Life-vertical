@@ -7,15 +7,100 @@ You run a single command from your project repo
         ↓
 CLI reads your git diff locally (your branch vs any base branch)
         ↓
-Sends the diff to Groq AI (Llama 3.3 70B) for review
+Enriches diff with full file content for cross-method analysis
         ↓
-AI analyzes for: 🐛 Bugs, 🔒 Security, ⚡ Performance, 🎨 Style issues
+Sends EACH file individually to Groq AI (Llama 3.3 70B) with a 21-rule checklist
         ↓
-Posts a formatted review to your Slack channel
+AI performs deep line-by-line analysis per file checking:
+   🔴 Null Safety  🔒 Security  ⚠️ Error Handling
+   🧹 Dead Code    ♻️ DRY       🔄 Data Consistency  📐 API Design
+        ↓
+Per-file reviews are aggregated into a final report with cross-file analysis
+        ↓
+Posts a formatted, section-separated review to your Slack channel
         ↓
 Team discusses and resolves suggestions
 ```
 **No GitHub tokens. No org admin access. Completely free.**
+---
+## How the Multi-Pass Review Works
+Unlike a simple "send all diffs at once" approach, this bot uses a **file-by-file multi-pass strategy** to work within Groq's free tier token limits while maximizing review depth:
+### Phase 1: Per-File Deep Review
+```
+For each changed file:
+  1. Extract the diff patch with line numbers (L1, L2, ...)
+  2. Load the full file content via `git show HEAD:<filename>`
+  3. Send BOTH to the AI with the 21-rule checklist prompt
+  4. Store the per-file review result
+  5. Wait 15 seconds (Groq free tier: 12K tokens/minute rolling window)
+  6. If rate-limited (429), auto-retry after the wait time specified by Groq
+```
+Each file is reviewed **independently** with its full context, so the AI can:
+- Compare null-check patterns across methods within the same class
+- Detect duplicated logic between methods in the same file
+- Trace variable assignments line-by-line for dead code detection
+- Cross-reference imports against actual usage
+### Phase 2: Aggregation & Cross-File Analysis
+```
+After all files are reviewed:
+  1. Combine all per-file reviews into one prompt
+  2. Send to AI with aggregation instructions
+  3. AI deduplicates, adds severity ratings, and finds cross-file issues:
+     - Same object null-checked in File A but not in File B
+     - Same builder pattern duplicated across different service files
+     - Inconsistent error handling (one file logs, another swallows)
+  4. Final report is formatted and posted to Slack
+```
+### Why Multi-Pass?
+| Approach | Token Usage | Depth | Cross-File Analysis |
+|----------|------------|-------|---------------------|
+| Single pass (all files) | ❌ Exceeds Groq free tier limit | Shallow — AI skims | ❌ None |
+| **Multi-pass (file by file)** | ✅ Fits within 12K TPM | **Deep — line by line** | ✅ In aggregation phase |
+---
+## The AI Review Prompt (21 Rules)
+The bot uses a structured **21-rule checklist** that the AI must check against every line of code. Each rule has an ID (R1–R21) for traceability in the output.
+### 🔴 Null Safety (R1–R4)
+| Rule | What It Catches |
+|------|----------------|
+| **R1** | Method calls on objects that could be null (from DB lookups, service calls, `.get()`) |
+| **R2** | Method chain NPEs like `a.getB().getC()` where any intermediate could be null |
+| **R3** | `.trim()`, `.toLowerCase()`, `.length()` etc. called directly on a String parameter that could be null |
+| **R4** | Inconsistent null checks — method A checks null but method B in the same class doesn't |
+### 🔒 Security (R5–R9)
+| Rule | What It Catches |
+|------|----------------|
+| **R5** | Hardcoded secrets, API keys, passwords in source code (patterns like `sk_`, `api_key`, long alphanumeric constants) |
+| **R6** | Log injection — user input concatenated with `+` into log statements instead of `{}` placeholders |
+| **R7** | Sensitive data logged via `.toString()` on Maps, DTOs, request objects containing payment/card data |
+| **R8** | Stack traces, `e.getMessage()`, `e.getStackTrace()` exposed in HTTP responses |
+| **R9** | Missing input validation — `Enum.valueOf()` without try-catch, unvalidated controller params |
+### ⚠️ Error Handling (R10–R12)
+| Rule | What It Catches |
+|------|----------------|
+| **R10** | Empty catch blocks — exception swallowed silently |
+| **R11** | Catch block that catches Exception but doesn't log the exception object |
+| **R12** | Generic `catch(Exception)` when only specific checked exceptions are thrown |
+### 🧹 Dead Code (R13–R16)
+| Rule | What It Catches |
+|------|----------------|
+| **R13** | Variable assigned then immediately overwritten without being read (dead computation / variable shadowing) |
+| **R14** | Unused imports — import present but class never referenced in the code |
+| **R15** | Unused private methods or fields |
+| **R16** | Unreachable code after return/throw/break |
+### ♻️ DRY / Reusability (R17–R18)
+| Rule | What It Catches |
+|------|----------------|
+| **R17** | Duplicated logic across methods — URL construction, builder patterns, string assembly |
+| **R18** | Private helper methods that exist but are never called |
+### 🔄 Data Consistency (R19)
+| Rule | What It Catches |
+|------|----------------|
+| **R19** | Multiple DB writes (save + update) without `@Transactional`, risking partial failures |
+### 📐 API Design (R20–R21)
+| Rule | What It Catches |
+|------|----------------|
+| **R20** | Raw types — `ResponseEntity` without type parameter |
+| **R21** | `@GetMapping` on methods that modify state |
 ---
 ## Prerequisites
 | Requirement | Details |
@@ -29,11 +114,11 @@ Team discusses and resolves suggestions
 ## Project Structure
 ```
 prBot/
-├── index.js              # CLI entry point — handles commands & orchestration
+├── index.js              # CLI entry point — orchestrates multi-pass review pipeline
 ├── lib/
-│   ├── local-git.js      # Reads git diff locally using git commands
-│   ├── ai-reviewer.js    # Sends diff to Groq/Gemini AI for analysis
-│   └── slack.js          # Posts formatted results to Slack via webhook
+│   ├── local-git.js      # Reads git diff locally + provides full file content
+│   ├── ai-reviewer.js    # Multi-pass AI reviewer (per-file → aggregation)
+│   └── slack.js          # Formats & posts results to Slack (markdown → mrkdwn)
 ├── .env                  # Your API keys (never commit this!)
 ├── .env.example          # Template showing required keys
 ├── .gitignore            # Ignores node_modules and .env
@@ -41,10 +126,19 @@ prBot/
 └── README.md             # This file
 ```
 ### How each file works:
-- **`index.js`** — The main CLI. Parses your command (`review` or `test-slack`), validates config, orchestrates the pipeline: diff → AI → Slack.
-- **`lib/local-git.js`** — Runs `git diff` between your current branch and the base branch. Parses the unified diff format into per-file changes. No GitHub API or token needed.
-- **`lib/ai-reviewer.js`** — Takes the parsed diff and sends it to the AI (Groq) with a code review prompt. Returns categorized suggestions (bugs, security, performance, style).
-- **`lib/slack.js`** — Formats the AI review into Slack Block Kit messages and posts via incoming webhook.
+- **`index.js`** — The main CLI. Parses your command (`review` or `test-slack`), validates config, orchestrates the pipeline: diff → enrich with full file content → file-by-file AI review → aggregate → Slack. Shows per-file progress in the terminal.
+- **`lib/local-git.js`** — Runs `git diff` between your current branch and the base branch. Parses the unified diff format into per-file changes with line numbers. Also provides full file content via `git show` for cross-method analysis. No GitHub API or token needed.
+- **`lib/ai-reviewer.js`** — The core review engine. Reviews each file individually against the 21-rule checklist, with full file content for context. Includes:
+  - `PER_FILE_SYSTEM_PROMPT` — The 21-rule checklist prompt
+  - `AGGREGATION_SYSTEM_PROMPT` — Cross-file analysis and deduplication
+  - Auto-retry with backoff for Groq 429 rate limit errors
+  - 15-second delays between API calls for Groq free tier
+  - Progress callback for terminal UI updates
+- **`lib/slack.js`** — Converts AI markdown output to Slack Block Kit format. Handles:
+  - Markdown → Slack mrkdwn conversion (`##` → bold, `**` → `*`)
+  - Section-based layout with dividers between issue categories
+  - Splits long sections at bullet boundaries (3000 char Slack limit)
+  - Multi-message support if review exceeds 50-block Slack limit
 ---
 ## Setup Guide
 ### Step 1: Install Dependencies
@@ -113,19 +207,30 @@ node ~/companyProjects/prBot/index.js review --base develop
 **Expected output:**
 ```
 🔍 PR Review CLI
-✔ Diff ready: your-branch → develop (X files, +N -N)
-✔ AI review complete (llama-3.3-70b-versatile)
+✔ Diff ready: your-branch → develop (5 files, +202 -149)
+⠋ Reviewing with groq (file 1/5: PaymentLinkController.java)...
+⠋ Reviewing with groq (file 2/5: PaymentLinkServiceImpl.java)...
+⠋ Reviewing with groq (file 3/5: PaymentCallbackServiceImpl.java)...
+⠋ Reviewing with groq (file 4/5: PaymentCallbackController.java)...
+⠋ Reviewing with groq (file 5/5: PaymentRedirectionServiceImpl.java)...
+⠋ Aggregating 5 file reviews...
+✔ AI review complete — 5 files reviewed (llama-3.3-70b-versatile)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   Review Results
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ## Summary
-[AI-generated summary of your changes]
-## Risk Level: Low/Medium/High
+[AI-generated summary with severity ratings]
+## Risk Level: Medium
 ## Issues Found
-[Categorized suggestions]
+### 🔴 Null Safety Issues
+- 🔴 [PaymentCallbackController.java:67]: [R1] `orderContext` — ...
+### 🔒 Security Issues
+- 🔴 [PaymentLinkServiceImpl.java:43]: [R5] `PAYMENT_GATEWAY_API_KEY` — ...
+[... categorized by R# rules ...]
 ✔ Review posted to Slack ✅
 Done! 🎉
 ```
+> ⏱️ **Timing:** Expect ~2-3 minutes for a 5-file review on Groq free tier (15s cooldown between files to respect rate limits).
 ---
 ## Usage
 ### Basic Commands
@@ -144,14 +249,11 @@ node ~/companyProjects/prBot/index.js review --base develop --repo ~/companyProj
 # Focus on specific areas only
 node ~/companyProjects/prBot/index.js review --base develop --focus bugs,security
 ```
-
-### Setup up your Github username
-
+### Set up your Git username
 ```bash
 git config --global user.name "Your Name"
 git config --global user.email "your.email@company.com"
 ```
-
 ### All CLI Options
 ```
 pr-review review [options]
@@ -164,20 +266,49 @@ Options:
 pr-review test-slack       Test your Slack webhook connection
 ```
 ---
+## Architecture: Review Pipeline
+```
+┌──────────────────────────────────────────────────────────────┐
+│                        index.js                              │
+│                    (CLI Orchestrator)                         │
+├──────────────────────────────────────────────────────────────┤
+│                                                              │
+│  1. Parse CLI args (--base, --repo, --focus)                 │
+│  2. Validate env vars (GROQ_API_KEY, SLACK_WEBHOOK_URL)      │
+│  3. Call local-git.js → get diff                             │
+│  4. Call ai-reviewer.js → enrich + review + aggregate        │
+│  5. Call slack.js → format + post                            │
+│                                                              │
+└──────────┬──────────────────┬──────────────────┬─────────────┘
+           │                  │                  │
+     ┌─────▼─────┐    ┌──────▼──────┐    ┌──────▼──────┐
+     │ local-git  │    │ ai-reviewer │    │   slack     │
+     │            │    │             │    │             │
+     │ git diff   │    │ Per-file:   │    │ markdown →  │
+     │ git show   │    │  R1-R21     │    │ Slack mrkdwn│
+     │ git log    │    │  checklist  │    │             │
+     │            │    │             │    │ Section     │
+     │ Returns:   │    │ Aggregation:│    │ splitting   │
+     │ - patches  │    │  Cross-file │    │             │
+     │ - stats    │    │  Dedup      │    │ Multi-msg   │
+     │ - metadata │    │  Severity   │    │ support     │
+     └────────────┘    └─────────────┘    └─────────────┘
+```
+---
 ## Why Groq?
 | Factor | Groq | Google Gemini | OpenAI |
 |---|---|---|---|
 | **Cost** | ✅ **Completely free** | ⚠️ Free tier, but quota can be 0 | ❌ $0.01-0.15 per review |
-| **Speed** | ✅ ~2-5 seconds per review | ~5-10 seconds | ~10-15 seconds |
+| **Speed** | ✅ ~2-5 seconds per file | ~5-10 seconds | ~10-15 seconds |
 | **Signup** | ✅ Google account, instant | ✅ Google account | Needs billing setup |
-| **Rate limit** | ✅ ~30 req/min | Varies, can be 0 | Depends on spend |
+| **Rate limit** | ✅ 12K TPM (handled by multi-pass) | Varies, can be 0 | Depends on spend |
 | **Model quality** | ✅ Llama 3.3 70B (excellent) | Gemini Flash (good) | GPT-4o (excellent) |
 | **Credit card needed** | ✅ **No** | ✅ No | ❌ Yes (for API) |
 **Groq** is the best choice because:
 1. **Truly free** — no billing, no credit card, no hidden limits
 2. **Blazing fast** — Groq uses custom LPU hardware, reviews complete in seconds
 3. **High quality** — Llama 3.3 70B provides GPT-4-level code analysis
-4. **Generous limits** — hundreds of reviews per day on the free tier
+4. **Multi-pass friendly** — 12K TPM limit is handled gracefully by file-by-file review + auto-retry
 5. **No org permissions needed** — just your personal account
 ---
 ## Troubleshooting
@@ -189,6 +320,8 @@ pr-review test-slack       Test your Slack webhook connection
 | `GROQ_API_KEY not set` | Make sure `.env` exists in `~/companyProjects/prBot/` with your key |
 | `Slack webhook failed` | Verify the webhook URL in `.env` and test with `node index.js test-slack` |
 | `No changes found` | Commit your changes first (`git add . && git commit`) |
+| `Rate limit (429)` | Auto-handled with retry. If persistent, wait 60s and try again |
+| `Request too large (413)` | Too many changed files. Try reviewing fewer files with `git diff` filtering |
 ---
 ## Security Notes
 - ⚠️ **Never commit `.env`** — it's in `.gitignore` by default
