@@ -191,34 +191,7 @@ Why it is incomplete:
 
 This can produce routing bugs later in unrelated work.
 
-### 5. `try (BaggageInScope ...) { return mono; }` Around Lazy Reactive Code
-
-This is a very subtle failure mode and already appears in the repo.
-
-Current pattern example:
-
-- `library/src/main/java/com/library/utils/payoutsUtils/PayoutsNotificationUtil.java`
-
-Pattern:
-
-```java
-try (BaggageInScope baggage = tracer.createBaggageInScope(...)) {
-    log.debug("Baggage set");
-}
-
-return productCatalogService.getProductCatalogByProductCode(...).flatMap(...);
-```
-
-Why it fails:
-
-- `Mono` and `Flux` are lazy
-- the `try` block closes immediately
-- the reactive work starts later when someone subscribes
-- by that time the baggage scope is already gone
-
-So the code "looks" scoped, but the actual execution happens after the scope closed.
-
-### 6. Assuming There Is an "Axisbank Thread" or a "Credilio Thread"
+### 5. Assuming There Is an "Axisbank Thread" or a "Credilio Thread"
 
 This is not how it works.
 
@@ -237,7 +210,7 @@ It should be:
 
 - "this reused thread is currently executing work under some baggage scope"
 
-### 7. Assuming Kafka or Scheduler Flows Can Read Request Baggage
+### 6. Assuming Kafka or Scheduler Flows Can Read Request Baggage
 
 This will not work because there is no HTTP request there.
 
@@ -254,7 +227,7 @@ Why it fails:
 
 So non-HTTP entry points must seed baggage explicitly.
 
-### 8. Expecting Dynamic Routing When the Message / Job Does Not Carry Broker
+### 7. Expecting Dynamic Routing When the Message / Job Does Not Carry Broker
 
 If a Kafka message or cron job does not contain broker, the app cannot infer it reliably.
 
