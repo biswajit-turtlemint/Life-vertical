@@ -97,25 +97,6 @@ instead of:
 mono.subscribeWithBaggage(...);
 ```
 
-### 3. Subclassing Reactor types is not a good solution
-
-In theory, someone might think about creating custom types like:
-
-```java
-class TenantAwareMono<T> extends Mono<T> { ... }
-```
-
-This is not a good design here.
-
-Why:
-
-- Reactor operators return Reactor-managed publishers, not our custom subclass
-- we would lose the custom type as soon as normal Reactor chaining continues
-- it becomes fragile and difficult to maintain
-- it fights the framework instead of composing with it
-
-So subclassing does not give us a practical codebase-wide solution.
-
 ## Why Spring Interceptors or AOP Will Not Work Reliably
 
 This is the other common idea: "can we intercept `subscribe()` somehow?"
