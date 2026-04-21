@@ -1,198 +1,314 @@
-# `subscribeWithBaggage` and `BaggageUtil` Reference
+# `subscribeWithBaggage` Design Note
 
 ## Purpose
 
-This document explains the utility methods currently available in
-[`BaggageUtil.java`](/Users/biswajitrout/companyProjects/minterprise/library/src/main/java/com/leads/utils/BaggageUtil.java),
-especially the `subscribeWithBaggage(...)` overloads that were added to reduce
-repeated `withBaggage(...).subscribe(...)` boilerplate.
+This note explains the only parts we really need for detached multitenant
+reactive work:
 
-The goal is simple:
+- why raw detached `subscribe()` is risky in this codebase
+- why interceptor-style or `subscribe()` override ideas are not a safe solution
+- why `subscribeWithBaggage(...)` is the chosen approach
+- which `BaggageUtil` methods matter for that flow
 
-- capture the current broker from baggage
-- re-seed baggage for detached async execution
-- keep Mongo multitenant routing correct
-- reduce repeated code at `subscribe()` call sites
+This document is intentionally focused. It is not a full Reactor guide.
 
-## Important Constraint
+## The Actual Problem
 
-We cannot override Reactor's built-in `Mono.subscribe()` or `Flux.subscribe()`.
+Our multitenant DB routing depends on broker baggage being present at the moment
+Mongo routing happens.
+
+The normal request flow is:
+
+`x-broker -> MultiTenantWebFilter -> baggage -> DAO/factory routing -> Mongo selection`
+
+This works fine as long as execution stays inside the same returned reactive
+chain.
+
+The problem starts when code manually detaches work like this:
+
+```java
+somePublisher.subscribe(...);
+```
+
+At that point:
+
+- a new subscription boundary is created
+- the original request-scoped baggage may not be present where the detached work runs
+- Mongo routing may fall back to the default tenant
+
+So the problem is not `Mono` or `Flux` themselves. The problem is detached
+subscription that needs tenant-aware DB work without explicitly reseeding the
+tenant baggage.
+
+## What We Need the Solution To Do
+
+For detached async work, the solution must do these steps every time:
+
+1. capture the current broker from baggage before detaching
+2. open a baggage scope for the detached publisher
+3. run the publisher inside that scope
+4. close the scope properly
+5. log enough information to debug which detached operation ran with which broker
+
+That is exactly what `subscribeWithBaggage(...)` does.
+
+## Why Overriding `subscribe()` Will Not Work
+
+This idea sounds attractive at first: "why not make normal `subscribe()`
+automatically behave like `subscribeWithBaggage()`?"
+
+In practice, it does not fit Java + Reactor safely.
+
+### 1. `Mono` and `Flux` are Reactor library types
+
+We do not own `Mono` or `Flux`. They come from Reactor.
+
+That means:
+
+- we cannot modify their source
+- we cannot add new instance methods to them
+- we cannot safely redefine their existing `subscribe()` behavior
+
+So there is no clean way to make this compile:
+
+```java
+publisher.subscribeWithBaggage(...)
+```
+
+unless we create our own wrapper utility around the publisher.
+
+### 2. Java does not have extension methods
+
+In some languages, you can add methods to existing types externally. Java does
+not support that model.
+
+So we cannot "attach" a custom method to `Mono` or `Flux` the way Kotlin
+extension functions would allow.
+
+That is why the correct Java shape is:
+
+```java
+baggageUtil.subscribeWithBaggage(...);
+```
+
+instead of:
+
+```java
+mono.subscribeWithBaggage(...);
+```
+
+### 3. Subclassing Reactor types is not a good solution
+
+In theory, someone might think about creating custom types like:
+
+```java
+class TenantAwareMono<T> extends Mono<T> { ... }
+```
+
+This is not a good design here.
 
 Why:
 
-- `Mono` and `Flux` are library classes from Reactor
-- Java does not support extension methods
-- Reactor global hooks are too broad for this use case
-- Spring AOP cannot safely intercept every local `publisher.subscribe(...)` call
+- Reactor operators return Reactor-managed publishers, not our custom subclass
+- we would lose the custom type as soon as normal Reactor chaining continues
+- it becomes fragile and difficult to maintain
+- it fights the framework instead of composing with it
 
-Because of that, the safe pattern is:
+So subclassing does not give us a practical codebase-wide solution.
 
-- normal returned chains continue to use Reactor normally
-- detached fire-and-forget work uses `subscribeWithBaggage(...)`
+## Why Spring Interceptors or AOP Will Not Work Reliably
 
-## What `BaggageUtil` Contains Today
+This is the other common idea: "can we intercept `subscribe()` somehow?"
 
-`BaggageUtil` currently has four groups of methods:
+Not reliably.
 
-1. baggage creation and lookup helpers
-2. `withBaggage(...)` wrappers for `Mono` and `Flux`
-3. `subscribeWithBaggage(...)` overloads for compact detached subscriptions
-4. span helpers
+### 1. `subscribe()` is usually called inside method bodies, not on Spring beans
 
----
+Spring AOP works best when a Spring bean method is invoked through the Spring
+proxy boundary.
 
-## 1. Baggage Creation and Lookup Helpers
+Example of what AOP is good at:
 
-### `createBaggageInScope(String baggageName, String tenant)`
+```java
+someService.doWork();
+```
 
-What it does:
+Example of what our problem usually looks like:
 
-- opens a Micrometer baggage scope for the given baggage key and value
+```java
+repository.save(entity).subscribe();
+```
 
-When to use:
+That `subscribe()` call is just a local method invocation on an object inside a
+method body. Spring AOP does not reliably wrap arbitrary internal local calls
+like that.
 
-- only when code explicitly needs a raw `BaggageInScope`
-- most business code should prefer `withBaggage(...)`
+So even if we add an aspect, it will not give us dependable coverage over every
+detached `subscribe()` call site.
 
-### `getTenantBaggage(String baggageName)`
+### 2. We need the broker captured at the exact detach point
 
-What it does:
+Even if an interceptor could see a `subscribe()` call, it still has a deeper
+problem:
 
-- convenience wrapper over `getBaggage(...)`
+- the right broker value must be captured before the chain detaches
+- that capture must happen at the exact place where detached execution is being initiated
 
-Why it exists:
+This is not just "run some generic advice before subscribe."
+It is:
 
-- older call sites may use a tenant-specific method name
-- behavior is the same as `getBaggage(...)`
+- read current baggage now
+- preserve it
+- reopen it around the detached publisher
 
-### `addBaggage(String baggageName, String value)`
+That is business-critical contextual behavior, not just generic interception.
 
-What it does:
+So even a clever interceptor would still need logic equivalent to
+`subscribeWithBaggage(...)`, and it would be harder to reason about and debug.
 
-- directly writes a baggage value into scope using the tracer
-- logs the added baggage entry
+### 3. AOP would be too implicit for a high-risk flow
 
-When to use:
+Tenant routing is not something we want hidden behind surprising magic.
 
-- only if code must imperatively seed baggage right now
-- for reactive publishers, `withBaggage(...)` is usually cleaner
+If detached async code touches multitenant DB routing, the code should make that
+decision visible:
+
+```java
+baggageUtil.subscribeWithBaggage(...)
+```
+
+That line is explicit. A new developer can see:
+
+- this is detached work
+- this is multitenancy-sensitive
+- baggage is being preserved intentionally
+
+That clarity is valuable in reviews and debugging.
+
+## Why Reactor Global Hooks Are Also Not the Right Answer
+
+Another possible idea is to use Reactor hooks like `Hooks.onEachOperator(...)`
+or similar global instrumentation.
+
+This is also not a good fit.
+
+Why:
+
+- hooks are global
+- they affect every reactive chain in the application
+- they are much broader than the actual problem we are solving
+- they make behavior harder to reason about
+- they can create subtle side effects in unrelated flows
+
+Most importantly, our need is narrow:
+
+- only detached subscriptions that require tenant-aware DB routing
+
+A global Reactor hook is too large a hammer for that.
+
+## Chosen Approach
+
+The chosen approach is explicit helper-based composition:
+
+- request entry-point seeding remains in the filter
+- DB routing remains baggage-based
+- detached work uses `subscribeWithBaggage(...)`
+
+This gives us:
+
+- safe broker capture
+- explicit behavior at the risky boundary
+- reusable code
+- consistent logs
+- no hidden framework magic
+
+## The `BaggageUtil` Methods That Matter
+
+For this detached subscribe solution, these methods are the ones that matter.
 
 ### `getBaggage(String baggageName)`
 
-What it does:
+Purpose:
 
-- reads the current baggage value from the tracer
-- falls back to `TenantConstant.DEFAULT_TENANT` if baggage is missing or blank
-- logs the resolved value
+- reads the current baggage value
+- falls back to the default tenant if missing
 
 Why it matters:
 
-- this is the source of truth used by the multitenant DB routing code
-- `subscribeWithBaggage(...)` uses this method to capture the broker before detaching
-
-Example log:
-
-```text
-[TenantRouting][Baggage] baggageName=tenant resolvedValue=axisbank
-```
-
----
-
-## 2. `withBaggage(...)` Wrappers
-
-These methods do not subscribe by themselves. They only return a wrapped
-publisher that opens baggage before execution and closes it afterward.
+- `subscribeWithBaggage(...)` uses this to capture the broker before detaching
 
 ### `withBaggage(String baggageName, String value, Mono<T> mono)`
 
-What it does:
+Purpose:
 
-- opens baggage scope before the `Mono` runs
-- executes the original `Mono`
-- closes baggage scope at the end
+- wraps a `Mono` so it runs inside a baggage scope
 
-Use this when:
+Why it matters:
 
-- you already control the full reactive chain
-- you want to return the wrapped `Mono`
-- you do not want to subscribe immediately
+- this is the building block used internally by `subscribeWithBaggage(...)`
 
 ### `withBaggage(String baggageName, String value, Flux<T> flux)`
 
-What it does:
+Purpose:
 
-- same behavior as the `Mono` version
-- applies to a `Flux`
+- same as above, for `Flux`
 
-Use this when:
+### `subscribeWithBaggage(String operationName, String context, Mono<T> mono)`
 
-- you want a baggage-aware `Flux`
-- the subscription will happen elsewhere
+Purpose:
 
-Example logs:
-
-```text
-[TenantRouting][Baggage] opening scope name=tenant value=axisbank
-[TenantRouting][Baggage] closing scope name=tenant value=axisbank
-```
-
----
-
-## 3. `subscribeWithBaggage(...)` Overloads
-
-These are the compact methods added to reduce repeated code at detached
-subscription sites.
-
-All overloads follow the same base flow:
-
-1. log scheduling
-2. capture current broker from baggage
-3. wrap the publisher with `withBaggage(TENANT_DB_BAGGAGE, broker, ...)`
-4. subscribe
-5. log success, empty completion, next item, failure, and/or completion depending on publisher type
-
-### Internal Helpers Used by All Overloads
-
-#### `captureCurrentBroker()`
-
-What it does:
-
-- reads broker from `TenantConstant.TENANT_DB_BAGGAGE`
-- falls back through `getBaggage(...)`
-- logs the captured broker
-
-Example log:
-
-```text
-[subscribeWithBaggage] captured broker=axisbank
-```
-
-#### `buildOperationDetails(String operationName, String context)`
-
-What it does:
-
-- combines operation name and optional context into one log string
-
-Examples:
-
-- `LifeQuotes.RequestHistory`
-- `LifeQuotes.RequestHistory | referenceId=AHWSIYH5E69`
-
-### A. Kept `Mono` Overloads
-
-#### `subscribeWithBaggage(String operationName, String context, Mono<T> mono)`
-
-What it does:
-
-- same as above, but also includes a context string in logs
-- uses default no-op success and error callbacks
+- compact detached `Mono` subscription with helper-managed logs and baggage scope
 
 Use this when:
 
-- you want compact call sites
-- helper-owned logs are enough
+- the detached work does not need custom success/error behavior
 
-Current real usage:
+### `subscribeWithBaggage(String operationName, String context, Mono<T> mono, Consumer<T> onSuccess, Consumer<Throwable> onError)`
+
+Purpose:
+
+- detached `Mono` subscription with custom callbacks
+
+Use this when:
+
+- the caller needs success or error side effects
+
+### `subscribeWithBaggage(String operationName, String context, Flux<T> flux)`
+
+Purpose:
+
+- compact detached `Flux` subscription with helper-managed logs and baggage scope
+
+Use this when:
+
+- the detached `Flux` does not need custom `onNext` or completion logic
+
+### `subscribeWithBaggage(String operationName, String context, Flux<T> flux, Consumer<T> onNext, Consumer<Throwable> onError, Runnable onComplete)`
+
+Purpose:
+
+- detached `Flux` subscription with custom callbacks
+
+Use this when:
+
+- the caller needs item handling or custom completion logic
+
+## Why the Public API Was Kept Small
+
+We intentionally trimmed the overloads down to the 4 methods above.
+
+Why:
+
+- the API should guide developers toward one clear pattern
+- too many convenience overloads make the utility harder to understand
+- the `operationName + context` form gives the best logs for debugging
+- one compact overload and one callback overload per publisher type is enough
+
+This keeps the standard usage predictable.
+
+## Example of the Preferred Pattern
+
+Compact `Mono`:
 
 ```java
 baggageUtil.subscribeWithBaggage(
@@ -201,39 +317,7 @@ baggageUtil.subscribeWithBaggage(
         savePremiumRequestHistory(r));
 ```
 
-### B. `Mono` Overload With Custom Callbacks
-
-#### `subscribeWithBaggage(String operationName, String context, Mono<T> mono, Consumer<T> onSuccess, Consumer<Throwable> onError)`
-
-What it does:
-
-- full `Mono` overload
-- caller supplies success and error handlers
-- helper still handles baggage capture and standard logs
-
-Use this when:
-
-- you want compact code plus custom side effects
-
-Mono log behavior:
-
-- when the `Mono` emits a value:
-  - logs `completed ... with broker=...`
-- when the `Mono` completes without emitting:
-  - logs `completed empty ... with broker=...`
-- when it fails:
-  - logs `failed ... with broker=... cause=...`
-
-### C. Kept `Flux` Overloads
-
-#### `subscribeWithBaggage(String operationName, String context, Flux<T> flux)`
-
-What it does:
-
-- same as above, with operation name and context
-- uses default no-op `onNext`, `onError`, and `onComplete`
-
-Current real usage:
+Compact `Flux`:
 
 ```java
 baggageUtil.subscribeWithBaggage(
@@ -244,126 +328,26 @@ baggageUtil.subscribeWithBaggage(
                 .subscribeOn(Schedulers.parallel()));
 ```
 
-### D. `Flux` Overload With Custom Callbacks
+## Team Rule
 
-#### `subscribeWithBaggage(String operationName, String context, Flux<T> flux, Consumer<T> onNext, Consumer<Throwable> onError, Runnable onComplete)`
+The rule we want developers to follow is:
 
-What it does:
+- if you are returning a reactive chain, do not manually call `subscribe()`
+- if you are detaching tenant-aware async work, use `subscribeWithBaggage(...)`
 
-- full `Flux` overload
-- operation name and context control logs
-- caller provides all custom callbacks
-
-Flux log behavior:
-
-- for every emitted item:
-  - logs `next ... with broker=...`
-- on failure:
-  - logs `failed ... with broker=... cause=...`
-- on completion:
-  - logs `completed ... with broker=...`
-
----
-
-## 4. Span Helpers
-
-### `createSpan(String spanName)`
-
-What it does:
-
-- creates and starts a tracing span
-
-### `setSpan(Span span)`
-
-What it does:
-
-- puts the given span into scope
-
-These are unrelated to the detached `subscribe()` multitenancy fix, but they
-are still part of `BaggageUtil`.
-
----
-
-## How to Choose the Right Overload
-
-### Use `withBaggage(...)` when:
-
-- you are returning a `Mono` or `Flux`
-- the chain is still part of normal reactive flow
-- you do not want to subscribe immediately
-
-### Use `subscribeWithBaggage(...)` when:
-
-- you are manually detaching work with `subscribe()`
-- the detached work needs broker-aware DB routing
-- you want the helper to capture broker and re-seed baggage
-
-### Use the compact overloads when:
-
-- helper logs are enough
-- you only need operation name and maybe context
-
-Best compact pattern:
-
-```java
-baggageUtil.subscribeWithBaggage(
-        "SomeOperation",
-        "referenceId=" + referenceId,
-        monoOrFlux);
-```
-
-### Use the callback overloads when:
-
-- you need custom `onSuccess`, `onNext`, `onError`, or `onComplete` behavior
-
----
-
-## What Logs to Search
-
-### Common helper logs
-
-```text
-[subscribeWithBaggage] scheduling
-[subscribeWithBaggage] captured broker=
-[subscribeWithBaggage] completed
-[subscribeWithBaggage] completed empty
-[subscribeWithBaggage] next
-[subscribeWithBaggage] failed
-```
-
-### Baggage scope logs
-
-```text
-[TenantRouting][Baggage] opening scope name=tenant
-[TenantRouting][Baggage] closing scope name=tenant
-```
-
-### Baggage resolution log
-
-```text
-[TenantRouting][Baggage] baggageName=tenant resolvedValue=
-```
-
----
-
-## Recommended Team Rule
-
-- If you are returning a reactive chain, do not manually call `subscribe()`.
-- If you must manually detach work and that work can touch multitenant DB routing, use `subscribeWithBaggage(...)`.
-- Prefer the compact `operationName + context + publisher` overload unless custom callbacks are genuinely needed.
+That rule is much easier to enforce in reviews, linting, or CI than any attempt
+to transparently change how Reactor itself behaves.
 
 ## Summary
 
-The added `BaggageUtil` methods are meant to solve two separate problems:
+Interceptor-style or `subscribe()` override ideas do not work well here because:
 
-- `withBaggage(...)` solves publisher wrapping
-- `subscribeWithBaggage(...)` solves detached subscription boilerplate
+- we do not own Reactor types
+- Java cannot extend those APIs the way we need
+- AOP does not reliably cover local `subscribe()` calls
+- global Reactor hooks are too broad and too implicit
+- tenant capture must happen explicitly at the detach point
 
-The overloads now exist in the minimal useful set:
-
-- named + context overloads for compact real-world usage
-- named + context + callback overloads for advanced cases
-
-That gives us a small API surface that can be reused across the codebase without
-repeating broker capture and baggage re-seeding logic at every detached
-`subscribe()` call site.
+So the right solution is not to hide detached subscription behavior.
+It is to make it explicit, small, reusable, and easy to review through
+`subscribeWithBaggage(...)`.
