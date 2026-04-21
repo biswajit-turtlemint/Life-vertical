@@ -290,16 +290,6 @@ baggageUtil.subscribeWithBaggage(
                 .subscribeOn(Schedulers.parallel()));
 ```
 
-## Team Rule
-
-The rule we want developers to follow is:
-
-- if you are returning a reactive chain, do not manually call `subscribe()`
-- if you are detaching tenant-aware async work, use `subscribeWithBaggage(...)`
-
-That rule is much easier to enforce in reviews, linting, or CI than any attempt
-to transparently change how Reactor itself behaves.
-
 ## Summary
 
 Interceptor-style or `subscribe()` override ideas do not work well here because:
