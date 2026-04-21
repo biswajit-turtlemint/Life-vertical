@@ -147,25 +147,6 @@ That is business-critical contextual behavior, not just generic interception.
 So even a clever interceptor would still need logic equivalent to
 `subscribeWithBaggage(...)`, and it would be harder to reason about and debug.
 
-### 3. AOP would be too implicit for a high-risk flow
-
-Tenant routing is not something we want hidden behind surprising magic.
-
-If detached async code touches multitenant DB routing, the code should make that
-decision visible:
-
-```java
-baggageUtil.subscribeWithBaggage(...)
-```
-
-That line is explicit. A new developer can see:
-
-- this is detached work
-- this is multitenancy-sensitive
-- baggage is being preserved intentionally
-
-That clarity is valuable in reviews and debugging.
-
 ## Why Reactor Global Hooks Are Also Not the Right Answer
 
 Another possible idea is to use Reactor hooks like `Hooks.onEachOperator(...)`
