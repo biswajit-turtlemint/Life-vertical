@@ -69,56 +69,60 @@ APIs:
 
 ```json
 {
-  "data": {
-    "premiumRequest": {
-      "pospUserName": "66bb2378ae016500016e5a06",
-      "personalDetails": {
-        "customerName": "ABID AHMAD SHAH",
-        "userEmail": "SHAHABID37@GMAIL.COM",
-        "userMobile": "7400400747"
-      },
-      "proposerDetails": {
-        "propAge": 53,
-        "propDOB": "1972-05-03T00:00:00+05:30",
-        "propFullName": "ABID AHMAD SHAH",
-        "propGender": "M"
-      },
-      "riskInsured": {
-        "insuredMembers": [
-          {
-            "insuredFullName": "biswajit rout",
-            "dateOfBirth": "2000-12-16T00:00:00+05:30",
-            "entryAge": 25,
-            "gender": "M"
-          }
-        ]
-      },
-      "planDetails": {
-        "benifitCalculationRate": 8,
-        "businessModel": "B2B",
-        "categories": [
-          "guaranteed"
-        ],
-        "existingInsuranceCoverAmount": 0,
-        "incomeBracketCode": "5 Lakhs",
-        "investmentGoals": "WEALTH_CREATION",
-        "investmentRisk": "high",
-        "isNonSelfJourney": true,
-        "maritalStatus": "SINGLE",
-        "maxIncome": 500000,
-        "minIncome": 500000,
-        "paymentFrequency": 12,
-        "planType": "Non-participating",
-        "policyType": "TRADITIONAL",
-        "policyTerm": 10,
-        "premium": 70000,
-        "premiumPaymentTerm": 9,
-        "profileType": "guaranteed-returns",
-        "riskAppetite": "MEDIUM"
-      },
-      "vertical": "LIFE"
+    "data": {
+        "premiumRequest": {
+            "pospUserName": "647f458828effa0001044980",
+            "personalDetails": {
+                "customerName": "ABID AHMAD SHAH",
+                "userEmail": "SHAHABID37@GMAIL.COM",
+                "userMobile": "7400400747",
+                "customerId": "8080515100"
+            },
+            "proposerDetails": {
+                "propAge": 53,
+                "propDOB": "03/07/1975",
+                "propFullName": "ABID AHMAD SHAH",
+                "propGender": "M"
+            },
+            "riskInsured": {
+                "insuredMembers": [
+                    {
+                        "insuredFullName": "BISWAJIT ROUT",
+                        "dateOfBirth": "16/12/2000",
+                        "entryAge": 25,
+                        "gender": "M"
+                    }
+                ]
+            },
+            "planDetails": {
+                "benifitCalculationRate": 8,
+                "businessModel": "B2B",
+                "categories": [
+                    "guaranteed"
+                ],
+                "existingInsuranceCoverAmount": 0,
+                "incomeBracketCode": "5 Lakhs",
+                "investmentGoals": "WEALTH_CREATION",
+                "investmentRisk": "high",
+                "isNonSelfJourney": true,
+                "maritalStatus": "SINGLE",
+                "maxIncome": 500000,
+                "minIncome": 500000,
+                "paymentFrequency": 12,
+                "planType": "Non-participating",
+                "policyType": "TRADITIONAL",
+                "policyTerm": 10,
+                "premium": 70000,
+                "premiumPaymentTerm": 9,
+                "profileType": "guaranteed-returns",
+                "riskAppetite": "MEDIUM",
+                "tmPincode": "192125",
+                "tmCity": "Srinagar",
+                "tmState": "JAMMU & KASHMIR"
+            },
+            "vertical": "LIFE"
+        }
     }
-  }
 }
 ```
 
@@ -126,51 +130,56 @@ APIs:
 
 ```json
 {
-  "data": {
-    "premiumRequest": {
-      "pospUserName": "66bb2378ae016500016e5a06",
-      "personalDetails": {
-        "customerName": "ABID AHMAD SHAH",
-        "userEmail": "SHAHABID37@GMAIL.COM",
-        "userMobile": "7400400747"
-      },
-      "proposerDetails": {},
-      "riskInsured": {
-        "insuredMembers": [
-          {
-            "insuredFullName": "ABID AHMAD SHAH",
-            "dateOfBirth": "1972-05-03T00:00:00+05:30",
-            "entryAge": 53,
-            "gender": "M"
-          }
-        ]
-      },
-      "planDetails": {
-        "benifitCalculationRate": 8,
-        "businessModel": "B2B",
-        "categories": [
-          "guaranteed"
-        ],
-        "existingInsuranceCoverAmount": 0,
-        "incomeBracketCode": "5 Lakhs",
-        "investmentGoals": "WEALTH_CREATION",
-        "investmentRisk": "high",
-        "isNonSelfJourney": false,
-        "maritalStatus": "SINGLE",
-        "maxIncome": 500000,
-        "minIncome": 500000,
-        "paymentFrequency": 12,
-        "planType": "Participating",
-        "policyType": "TRADITIONAL",
-        "policyTerm": 10,
-        "premium": 70000,
-        "premiumPaymentTerm": 9,
-        "profileType": "guaranteed-returns",
-        "riskAppetite": "MEDIUM"
-      },
-      "vertical": "LIFE"
+    "data": {
+        "premiumRequest": {
+            "pospUserName": "647f458828effa0001044980",
+            "personalDetails": {
+                "customerName": "ABID AHMAD SHAH",
+                "userEmail": "SHAHABID37@GMAIL.COM",
+                "userMobile": "7400400747",
+                "customerId": "8080515100"
+            },
+            "proposerDetails": {},
+            "riskInsured": {
+                "insuredMembers": [
+                    {
+                        "insuredFullName": "BISWAJIT ROUT",
+                        "dateOfBirth": "03/07/1975",
+                        // "dateOfBirth": "2000-12-16T00:00:00+05:30",
+                        "entryAge": 25,
+                        "gender": "M"
+                    }
+                ]
+            },
+            "planDetails": {
+                "benifitCalculationRate": 8,
+                "businessModel": "B2B",
+                "categories": [
+                    "guaranteed"
+                ],
+                "existingInsuranceCoverAmount": 0,
+                "incomeBracketCode": "5 Lakhs",
+                "investmentGoals": "WEALTH_CREATION",
+                "investmentRisk": "high",
+                "isNonSelfJourney": false,
+                "maritalStatus": "SINGLE",
+                "maxIncome": 500000,
+                "minIncome": 500000,
+                "paymentFrequency": 12,
+                "planType": "Non-participating",
+                "policyType": "TRADITIONAL",
+                "policyTerm": 10,
+                "premium": 70000,
+                "premiumPaymentTerm": 9,
+                "profileType": "guaranteed-returns",
+                "riskAppetite": "MEDIUM",
+                "tmPincode": "192125",
+                "tmCity": "Srinagar",
+                "tmState": "JAMMU & KASHMIR"
+            },
+            "vertical": "LIFE"
+        }
     }
-  }
 }
 ```
 
