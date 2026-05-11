@@ -405,58 +405,61 @@ APIs:
 
 ```json
 {
-  "data": {
-    "premiumRequest": {
-      "pospUserName": "66bb2378ae016500016e5a06",
-      "personalDetails": {
-        "customerName": "ABID AHMAD SHAH",
-        "userMobile": "7400400747",
-        "userEmail": "SHAHABID37@GMAIL.COM"
-      },
-      "proposerDetails": {
-        "propFullName": "ABID AHMAD SHAH",
-        "propGender": "M",
-        "propDOB": "1972-05-03T00:00:00+05:30",
-        "propAge": 53
-      },
-      "riskInsured": {
-        "insuredMembers": [
-          {
-            "insuredFullName": "biswajit rout",
-            "dateOfBirth": "2015-02-04T00:00:00+05:30",
-            "entryAge": 11,
-            "gender": "M"
-          }
-        ]
-      },
-      "planDetails": {
-        "benifitCalculationRate": 8,
-        "categories": [
-          "child"
-        ],
-        "planType": "Non-participating",
-        "policyType": "TRADITIONAL",
-        "includeCategory": true,
-        "maritalStatus": "SINGLE",
-        "investmentGoals": "CHILD_EDUCATION",
-        "riskAppetite": "MEDIUM",
-        "existingInsuranceCoverAmount": 0,
-        "incomeBracketCode": "6 Lakhs",
-        "investmentRisk": "high",
-        "maxIncome": 600000,
-        "minIncome": 600000,
-        "paymentFrequency": 12,
-        "policyTerm": 10,
-        "premiumPaymentTerm": 9,
-        "premium": 70000,
-        "profileType": "saving-for-child",
-        "businessModel": "B2B",
-        "isNonSelfJourney": true
-      },
-      "vertical": "LIFE",
-      "initialReqFlag": true
+    "data": {
+        "premiumRequest": {
+            "pospUserName": "66bb2378ae016500016e5a06",
+            "personalDetails": {
+                "customerName": "ABID AHMAD SHAH",
+                "userMobile": "7400400747",
+                "userEmail": "SHAHABID37@GMAIL.COM"
+            },
+            "proposerDetails": {
+                "propFullName": "ABID AHMAD SHAH",
+                "propGender": "M",
+                "propDOB": "1972-05-03T00:00:00+05:30",
+                "propAge": 53
+            },
+            "riskInsured": {
+                "insuredMembers": [
+                    {
+                        "insuredFullName": "biswajit rout",
+                        "dateOfBirth": "2015-02-04T00:00:00+05:30",
+                        "entryAge": 11,
+                        "gender": "M"
+                    }
+                ]
+            },
+            "planDetails": {
+                "benifitCalculationRate": 8,
+                "categories": [
+                    "child"
+                ],
+                "planType": "Non-participating",
+                "policyType": "TRADITIONAL",
+                "includeCategory": true,
+                "maritalStatus": "SINGLE",
+                "investmentGoals": "CHILD_EDUCATION",
+                "riskAppetite": "MEDIUM",
+                "existingInsuranceCoverAmount": 0,
+                "incomeBracketCode": "6 Lakhs",
+                "investmentRisk": "high",
+                "maxIncome": 600000,
+                "minIncome": 600000,
+                "paymentFrequency": 12,
+                "policyTerm": 10,
+                "premiumPaymentTerm": 9,
+                "premium": 70000,
+                "profileType": "saving-for-child",
+                "businessModel": "B2B",
+                "isNonSelfJourney": true,
+                "tmPincode": "400001",
+                "tmCity": "Mumbai G.P.O.",
+                "tmState": "MAHARASHTRA"
+            },
+            "vertical": "LIFE",
+            "initialReqFlag": true
+        }
     }
-  }
 }
 ```
 
@@ -464,64 +467,67 @@ APIs:
 
 ```json
 {
-  "data": {
-    "premiumRequest": {
-      "pospUserName": "66bb2378ae016500016e5a06",
-      "personalDetails": {
-        "customerName": "ABID AHMAD SHAH",
-        "userEmail": "SHAHABID37@GMAIL.COM",
-        "userMobile": "7400400747"
-      },
-      "proposerDetails": {
-        "propAge": 53,
-        "propDOB": "1972-05-03T00:00:00+05:30",
-        "propFullName": "ABID AHMAD SHAH",
-        "propGender": "M"
-      },
-      "riskInsured": {
-        "insuredMembers": [
-          {
-            "insuredFullName": "biswajit rout",
-            "dateOfBirth": "2000-02-02T00:00:00+05:30",
-            "entryAge": 26,
-            "gender": "M"
-          }
-        ]
-      },
-      "planDetails": {
-        "benifitCalculationRate": 8,
-        "businessModel": "B2B",
-        "categories": [
-          "retirement"
-        ],
-        "defermentPeriod": 3,
-        "existingInsuranceCoverAmount": 0,
-        "includeCategory": true,
-        "incomeBracketCode": "6 Lakhs",
-        "investmentGoals": "RETIREMENT",
-        "investmentRisk": "high",
-        "isJointLife": false,
-        "isNonSelfJourney": true,
-        "maritalStatus": "SINGLE",
-        "maxIncome": 600000,
-        "minIncome": 600000,
-        "paymentFrequency": 12,
-        "payoutFrequency": "YEARLY",
-        "payoutIncome": 100000,
-        "planType": "Pension",
-        "policyType": "PENSION",
-        "plansByPension": false,
-        "policyTerm": 15,
-        "premium": 70000,
-        "premiumPaymentTerm": 9,
-        "profileType": "retirement",
-        "riskAppetite": "MEDIUM"
-      },
-      "initialReqFlag": true,
-      "isAsync": true,
-      "vertical": "LIFE"
+    "data": {
+        "premiumRequest": {
+            "pospUserName": "66bb2378ae016500016e5a06",
+            "personalDetails": {
+                "customerName": "ABID AHMAD SHAH",
+                "userEmail": "SHAHABID37@GMAIL.COM",
+                "userMobile": "7400400747"
+            },
+            "proposerDetails": {
+                "propFullName": "ABID AHMAD SHAH",
+                "propGender": "M",
+                "propDOB": "1972-05-03T00:00:00+05:30",
+                "propAge": 53
+            },
+            "riskInsured": {
+                "insuredMembers": [
+                    {
+                        "insuredFullName": "ABID AHMAD SHAH",
+                        "dateOfBirth": "1972-05-03T00:00:00+05:30",
+                        "entryAge": 53,
+                        "gender": "M"
+                    }
+                ]
+            },
+            "planDetails": {
+                "benifitCalculationRate": 8,
+                "businessModel": "B2B",
+                "categories": [
+                    "retirement"
+                ],
+                "defermentPeriod": 5,
+                "existingInsuranceCoverAmount": 0,
+                "includeCategory": true,
+                "incomeBracketCode": "5 Lakhs",
+                "investmentGoals": "RETIREMENT",
+                "investmentRisk": "high",
+                "isJointLife": false,
+                "isNonSelfJourney": false,
+                "maritalStatus": "SINGLE",
+                "maxIncome": 500000,
+                "minIncome": 500000,
+                "tmPincode": "400001",
+                "tmCity": "Mumbai G.P.O.",
+                "tmState": "MAHARASHTRA",
+                "paymentFrequency": 12,
+                "payoutFrequency": "YEARLY",
+                "payoutIncome": 100000,
+                "planType": "Non-participating",
+                "policyType": "PENSION",
+                "plansByPension": false,
+                "policyTerm": 15,
+                "premium": 70000,
+                "premiumPaymentTerm": 9,
+                "profileType": "retirement",
+                "riskAppetite": "MEDIUM"
+            },
+            "initialReqFlag": true,
+            "isAsync": true,
+            "vertical": "LIFE"
+        }
     }
-  }
 }
 ```
 
@@ -529,59 +535,62 @@ APIs:
 
 ```json
 {
-  "data": {
-    "premiumRequest": {
-      "pospUserName": "66bb2378ae016500016e5a06",
-      "personalDetails": {
-        "customerName": "ABID AHMAD SHAH",
-        "userEmail": "SHAHABID37@GMAIL.COM",
-        "userMobile": "7400400747"
-      },
-      "proposerDetails": {},
-      "riskInsured": {
-        "insuredMembers": [
-          {
-            "insuredFullName": "ABID AHMAD SHAH",
-            "dateOfBirth": "1972-05-03T00:00:00+05:30",
-            "entryAge": 53,
-            "gender": "M"
-          }
-        ]
-      },
-      "planDetails": {
-        "benifitCalculationRate": 8,
-        "businessModel": "B2B",
-        "categories": [
-          "retirement"
-        ],
-        "defermentPeriod": 5,
-        "existingInsuranceCoverAmount": 0,
-        "includeCategory": true,
-        "incomeBracketCode": "5 Lakhs",
-        "investmentGoals": "RETIREMENT",
-        "investmentRisk": "high",
-        "isJointLife": false,
-        "isNonSelfJourney": false,
-        "maritalStatus": "SINGLE",
-        "maxIncome": 500000,
-        "minIncome": 500000,
-        "paymentFrequency": 12,
-        "payoutFrequency": "YEARLY",
-        "payoutIncome": 100000,
-        "planType": "Pension",
-        "policyType": "PENSION",
-        "plansByPension": false,
-        "policyTerm": 15,
-        "premium": 70000,
-        "premiumPaymentTerm": 9,
-        "profileType": "retirement",
-        "riskAppetite": "MEDIUM"
-      },
-      "initialReqFlag": true,
-      "isAsync": true,
-      "vertical": "LIFE"
+    "data": {
+        "premiumRequest": {
+            "pospUserName": "66bb2378ae016500016e5a06",
+            "personalDetails": {
+                "customerName": "ABID AHMAD SHAH",
+                "userEmail": "SHAHABID37@GMAIL.COM",
+                "userMobile": "7400400747"
+            },
+            "proposerDetails": {},
+            "riskInsured": {
+                "insuredMembers": [
+                    {
+                        "insuredFullName": "ABID AHMAD SHAH",
+                        "dateOfBirth": "1972-05-03T00:00:00+05:30",
+                        "entryAge": 53,
+                        "gender": "M"
+                    }
+                ]
+            },
+            "planDetails": {
+                "benifitCalculationRate": 8,
+                "businessModel": "B2B",
+                "categories": [
+                    "retirement"
+                ],
+                "defermentPeriod": 5,
+                "existingInsuranceCoverAmount": 0,
+                "includeCategory": true,
+                "incomeBracketCode": "5 Lakhs",
+                "investmentGoals": "RETIREMENT",
+                "investmentRisk": "high",
+                "isJointLife": false,
+                "isNonSelfJourney": false,
+                "maritalStatus": "SINGLE",
+                "maxIncome": 500000,
+                "minIncome": 500000,
+                "tmPincode": "400001",
+                "tmCity": "Mumbai G.P.O.",
+                "tmState": "MAHARASHTRA",
+                "paymentFrequency": 12,
+                "payoutFrequency": "YEARLY",
+                "payoutIncome": 100000,
+                "planType": "Non-participating",
+                "policyType": "PENSION",
+                "plansByPension": false,
+                "policyTerm": 15,
+                "premium": 70000,
+                "premiumPaymentTerm": 9,
+                "profileType": "retirement",
+                "riskAppetite": "MEDIUM"
+            },
+            "initialReqFlag": true,
+            "isAsync": true,
+            "vertical": "LIFE"
+        }
     }
-  }
 }
 ```
 
